@@ -1,0 +1,252 @@
+---
+title: "Readme_and_Examples"
+author: "Thomas FitzGerald"
+date: "12/31/2022"
+output: html_document
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+# Summary
+
+This is part of an ongoing project to develop a Twitter Dashboard for
+the Tampa Bay Estuary Program on environmental issues. The associated
+files are part of Stage 1, which focuses on topic viability, and
+developing a workflow for query development.
+
+# Directory Contents
+
+The directory containing this file should contain the following files:
+  * $twitter\_functions.R$: Contains the functions demonstrated here.
+  * $queries.R$: Contains pre-defined search queries. Variables are named
+'$queries.x$' 
+  * $location\_terms.R$: Contains pre-defined location terms to add
+to queries. Variables are named '$locations.x$' 
+  * $search\_terms.R$: Contains search terms related to the queries in $queries.R$. Variables are named
+'$terms.x$'
+
+```{r}
+source("Project_Functions.R")
+source("queries.R")
+source("Project_Objects.R")
+#source("location_terms.R")
+```
+
+#Setup ***IMPORTANT: token.R is not included, and defines the
+bearer_token variable. You will need to add bearer_token manually.***
+
+```{r}
+#One of these two options:
+source("Bearer_Token.R") #(defines bearer_token)
+#bearer_token = 
+
+headers = c(
+  `Authorization` = sprintf('Bearer %s', bearer_token)
+)
+```
+
+Required Libraries:
+
+```{r Libraries, include=FALSE}
+library(httr)
+library(dplyr)
+library(plotly)
+```
+
+# Function Walkthrough
+
+This document will walk you through example use-cases for all the
+functions in $twitter\_functions.R$:
+
+  * $set\_parameters$: Formats input for query_twitter or query_twitter_count.
+  * $query\_twitter\_count$: Returns a count of tweets matching criteria.
+  * $query\_twitter$: Retrieves tweets matching search criteria.
+  * $query\_graph\_comparison$: Prints & returns a plotly line plot of tweet counts over time between two queries. 
+  * $query\_text\_comparison$: Used for comparing tweets returned by two queries
+
+# set_parameters()
+
+$set\_parameters()$ creates a parameter list that can be fed into
+$query\_twitter()$ or $query\_twitter\_count()$. If you omit end.date, queries
+will return all results from start.date, so the only required arguments
+are '$query.text$', and '$start.date$'.
+
+# query_twitter_count()
+
+$query\_twitter\_count()$ returns the \# of tweets in a date range.
+
+```{r}
+query.text<-'leachate'
+start.date<-'2022-09-01'
+end.date<-'2022-09-02'
+params<-set_parameters(query.text,start.date,end.date)
+query_twitter_count(params)
+```
+
+# query_twitter
+
+$query\_twitter()$ can be used with the same parameters to retrieve the
+actual tweets:
+
+```{r}
+# Feel free to uncomment and run it
+
+# query_twitter(params)
+```
+
+By default, the follow fields are retrieved: 
+  * $tweet.fields$: $id$, $text$, $created\_at$, $author\_id$, $lang$
+  * $user.fields$: 
+  * location expansions:
+  * expansions: $author\_id$ 'joins' the two, where
+$tweet.fields.author_id=user.fields.id$. 
+
+You can also get additional
+fields using $set\_parameters()$ by editing the $tweet.fields$ and
+$user.fields$ parameters:
+
+```{r}
+query.text<-'leachate'
+start.date<-'2022-09-01'
+end.date<-'2022-09-02'
+
+params<-set_parameters(query.text=query.text,
+                       start.date=start.date,
+                       end.date=end.date,
+                       tweet.fields='author_id,created_at,lang,attachments,context_annotations,conversation_id,entities,geo,in_reply_to_user_id,possibly_sensitive,public_metrics,referenced_tweets,reply_settings,source,withheld', #id/text are automatic
+                       user.fields='location,description,entities,pinned_tweet_id,profile_image_url,public_metrics,url,verified,withheld', #name/username are automatic
+                       expansions='author_id')
+
+
+# Feel free to uncomment and run it
+
+# query_twitter(params,iter.limit=1)
+```
+
+(Scroll over to check the additional variables)
+
+Above is not a comprehensive list. For more options, check out:
+<https://developer.twitter.com/en/docs/twitter-api/fields>
+<https://developer.twitter.com/en/docs/twitter-api/data-dictionary/object-model/tweet>
+<https://developer.twitter.com/en/docs/twitter-api/data-dictionary/object-model/user>
+
+Some pre-defined queries & location terms are also imported from the
+$source()$ commands in the first block of this document. All these
+variables start with '$queries.$' or '$locations.$', so you can pull them up
+with auto-complete. \*Make sure to use $sep=' '$, or it may generate a
+syntax error in the query. There's no error message when this happens,
+it just returns 0 results.
+
+```{r}
+query.text<-queries.deepwellinjection
+query.text<-paste(query.text,area.terms[["Tampa"]],sep=' ')
+query.text
+```
+
+```{r}
+params<-set_parameters(query.text,'2022-08-28')
+
+# Feel free to uncomment and run it
+# query_twitter_count(params)
+```
+
+Besides the above, there are also two functions specifically for
+comparing query results.
+
+# location terms
+
+Query terms that indicate location mentions:
+
+```{r}
+#All Location Terms
+locations.all<-'-(-tampa -bradenton -bradentonbeach -clearwater -clearwaterbeach -hillsborough -manatee_county -pasco -pinellas -sarasota -siesta_key -st_pete -st_petersburg -apollo_beach -gibsonton -ruskin -wimauma -sun_city -hillsborough_bay -indian_rocks_beach -tarpon_springs -belleair -palm_harbor -safety_harbor -dunedin -honeymoon_island -sand_key -caladesi -lake_tarpon -madeira_beach -treasure_island -sunshine_skyway -redington -fort_de_soto -fort_desoto -pass_a_grille -boca_ciega_bay -anna_maria_island -longboat_key -holmes_beach -manatee_river -port_manatee -(coquina_beach -NC -carolina) -venice -englewood -north_port -casey_key -nokomis -lemon_bay -st_armands -manasota_key -manasota_beach -englewood_beach -lido_key -lido_beach -port_richey -bayonet_point -anclote -cottee_river)'
+
+#Primary Locations Terms
+locations.primary<-'-(-tampa -bradenton -bradentonbeach -clearwater -clearwaterbeach -hillsborough -manatee_county -pasco -pinellas -sarasota -siesta_key -st_pete -st_petersburg)'
+
+#Secondary Location Terms (all)
+locations.secondary.all<-'-(-apollo_beach -gibsonton -ruskin -wimauma -sun_city -hillsborough_bay -indian_rocks_beach -tarpon_springs -belleair -palm_harbor -safety_harbor -dunedin -honeymoon_island -sand_key -caladesi -lake_tarpon -madeira_beach -treasure_island -sunshine_skyway -redington -fort_de_soto -fort_desoto -pass_a_grille -boca_ciega_bay -anna_maria_island -longboat_key -holmes_beach -manatee_river -port_manatee -(coquina_beach -NC -carolina) -venice -englewood -north_port -casey_key -nokomis -lemon_bay -st_armands -manasota_key -manasota_beach -englewood_beach -lido_key -lido_beach -port_richey -bayonet_point -anclote -cottee_river)'
+```
+
+# query_graph_comparison()
+
+$query\_graph\_comparison()$ runs $query\_twitter\_counts()$ for both queries,
+then produces a plotly lineplot of the results. This one runs fast, and
+is good for getting an overview of activity in a time frame.
+
+**The same query with different sets of location terms**
+
+```{r}
+query.text.1<-paste(main.queries[["IndustrialSpill"]],locations.primary,sep=' ')
+query.text.2<-paste(main.queries[["IndustrialSpill"]],locations.secondary.all,sep=' ')
+query_graph_comparison(start.date='2022-09-01',
+                       end.date='2022-09-30',
+                       query.text.1=query.text.1,
+                       query.text.2=query.text.2,
+                       topic_1='Primary Location Terms',
+                       topic_2='Secondary Location Terms')
+```
+
+
+**Similar topical queries (industrial and sewage spills), with the same set of location terms**
+
+```{r}
+
+query.text.1<-paste(main.queries[["IndustrialSpill"]],locations.primary,sep=' ')
+query.text.2<-paste(main.queries[["SewageSpill"]],locations.primary,sep=' ')
+query_graph_comparison(start.date='2022-07-01',
+                       end.date='2022-07-31',
+                       query.text.1=query.text.1,
+                       query.text.2=query.text.2,
+                       topic_1='Wastewater',
+                       topic_2='Sewage')
+```
+
+
+
+# query_text_comparison() 
+
+$query\_text\_comparison()$ runs $query\_twitter()$ for both queries, then
+compares the results. This one is slower, and is better used on short
+date ranges. Let's use July 1st-31st 2022 for the plot, since both queries
+had heightened activity those day:
+
+It returns a list of 4 dataframes: 
+  * [1] - Query 1's results 
+  * [2] - Query 2's results 
+  * [3] - Results found in both query's results 
+  * [4] - Text matching results
+
+```{r}
+
+terms.all <- c("wastewater", "contamin", "chemical", "stormwater", "storm water", "discharge", "pump", "tampa")
+
+results.list<-query_text_comparison(start.date = '2022-07-01',
+                                    end.date = '2022-07-31',
+                                    query.text.1 = query.text.1,
+                                    query.text.2 = query.text.2,
+                                    topic_1 = 'Wastewater',
+                                    topic_2 = 'Sewage'
+                                   # , term.list = NULL
+                                    , term.list = terms.all
+  )
+
+# Feel free to uncomment and run it
+# results.list[1] #Query1 results only
+# results.list[2] #Query2 results only
+# results.list[3] #Tweets appears in both queries only
+
+results.list[4] #Comparison
+```
+$results.list[4]$ works with the term.list argument for
+$query\_text\_comparison()$. This returns the proportion of each query's
+results that contain keywords. So, from the output above, one can notice that $45\%$ of tweets returned for the industrial spill query ($Query1$) had words with root "$contamin$" in it, while only $0.5\%$ had the word "$wastewater$". As far as location terms, $43\%$ of industrial spill tweets mentioned "$tampa$". For the sewage spill query ($Query2$), we had $50\%$ of tweets mention "$stormwater$", $30\%$ use words with root "$pump$", and $70\%$ of tweets contained mentions of "$tampa$".
+
+Keep in mind that the bulk of your results may be retweets or quotes, so
+the $50\%$ "$stormwater$" proportion could be heavily constituted of retweets emanating from one tweet.
+
+---
+
+I hope this document was useful to you. Please feel free to re-use any
+of the templates above!
