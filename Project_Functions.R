@@ -1,8 +1,3 @@
-############
-## Check the:
-##    1. INNER-JOIN in the "query_twitter()"
-##    2. '_' part in "fix_page".. seems to have an issue with lists of arbitrary length, with non-column structure (like edit_history)
-
 source("Bearer_Token.R")
 
 library(httr)
@@ -10,7 +5,6 @@ library(tidyverse)
 
 # https://developer.twitter.com/en/docs/twitter-api/data-dictionary/object-model/user
 # https://developer.twitter.com/en/docs/twitter-api/data-dictionary/object-model/place
-
 
 headers = c(
   `Authorization` = sprintf('Bearer %s', bearer_token)
@@ -228,7 +222,9 @@ query_twitter<-function(params,iter.limit=10,safety=FALSE){
     
     #Request Tweets
     if(safety){
-      response <- httr::GET(url = 'https://api.twitter.com/2/tweets/search/all', httr::add_headers(.headers=headers), query = params.extended)
+      response <- httr::GET(url = 'https://api.twitter.com/2/tweets/search/all', 
+                            httr::add_headers(.headers=headers), 
+                            query = params.extended)
       fas_body <-
         content(
           response,
@@ -281,6 +277,7 @@ query_twitter<-function(params,iter.limit=10,safety=FALSE){
       page.data<-left_join(fas_body$data,fas_body$includes$users,by=c("author_id"="id"))
     }
     
+    
     #Adds new page data to output.df, if both have valid results.
     #'NOTE: There was an ISSUE with "NULL" page.data... Evidently sometimes "page.data" can be NULL, be it from a:
     #           * 0-return query, OR
@@ -290,7 +287,7 @@ query_twitter<-function(params,iter.limit=10,safety=FALSE){
     if(!is.null(page.data)){
       #print(dim(page.data))
       #print(colnames(page.data))
-
+      
       page.data<-fix_page_data(page.data)
       
       #print(dim(page.data))
@@ -318,7 +315,8 @@ query_twitter<-function(params,iter.limit=10,safety=FALSE){
       }
   }
   #Finalize
-  if(!is.null(output.df)) output.df <- output.df %>% select(text, everything())
+  if (!is.null(output.df))  output.df <- output.df %>% select(text, everything())
+  
   return(output.df)
 }
 
@@ -730,5 +728,68 @@ postprocess.badterm.cleanup <- function(tweets, bad.terms, grep.terms=NULL, agre
   
   return(list(actual.inds=actual.inds,
               ind.drop=ind.drop))
+}
+
+
+
+## Breaking down an array of potentially HUGE geoboxes into sub-boxes
+## according to the 25mi x 25mi requirement 
+
+Mile.requirement.func <- function(bound.box.char){
+  
+  # To contain the final set of 25mi x 25mi boxes
+  full.char.box <- NULL
+  
+  # Going through each huge box in array
+  for (j in 1:length(bound.box.char)){
+    
+    # Getting the numerical value for its left/rightmost longitudes, top/bottom latitudes
+    y <- gsub("bounding_box:[", "", bound.box.char[j], fixed=T); 
+    y <- gsub("]", "", y, fixed=T);
+    y <- as.numeric(strsplit(y, split = " ")[[1]]);
+    
+    long_1 <- y[1]; long_2 <- y[3];  lat_1 <- y[2]; lat_2 <- y[4]
+    
+    ## Figuring out how many 25mi intervals are in the width and height of that huge box
+    n.rect.long <- ceiling((long_2 - long_1)*69/25)
+    n.rect.lat <- ceiling((lat_2 - lat_1)*69/25)
+    
+    ## Creating lists of well spaced out left-most and right-most longitudes, and top-most/bottom-most latitudes
+    lat_1_list <- lat_1 + c(0:(n.rect.lat - 1))*((lat_2 - lat_1)/n.rect.lat)
+    if (n.rect.lat > 1){
+      lat_2_list <- c(lat_1 + c(1:(n.rect.lat - 1))*((lat_2 - lat_1)/n.rect.lat), lat_2)
+    } else {
+      lat_2_list <- lat_2
+    }
+    
+    long_1_list <- long_1 + c(0:(n.rect.long - 1))*((long_2 - long_1)/n.rect.long)
+    if (n.rect.long > 1){
+      long_2_list <- c(long_1 + c(1:(n.rect.long - 1))*((long_2 - long_1)/n.rect.long), long_2)
+    } else {
+      long_2_list <- long_2
+    }
+    
+    # Rounding for prettyness
+    long_1_list <- round(long_1_list, 6); long_2_list <- round(long_2_list, 6);
+    lat_1_list <- round(lat_1_list, 6); lat_2_list <- round(lat_2_list, 6);
+    
+    
+    # Making intermediate char box, for that single HUGE box being broken into the 25mi x 25mi ones
+    char.box <- NULL
+    count <- 0
+    for (i in 1:n.rect.long){
+      for (j in 1:n.rect.lat){
+        count <- count + 1
+        char.box[count] <- paste0("bounding_box:[", 
+                                  long_1_list[i], " ", lat_1_list[j], " ", 
+                                  long_2_list[i], " ", lat_2_list[j], "]")
+      }
+    }
+    
+    full.char.box <- c(full.char.box, 
+                       char.box)
+  }
+  
+  return(paste0("(", paste0(full.char.box, collapse=" OR "), ")"))
 }
 

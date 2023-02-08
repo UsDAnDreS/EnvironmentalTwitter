@@ -1,3 +1,7 @@
+#######
+## ISSUE: the RETWEETS for GOOD ORIGINAL TWEETS - TEXT DOESN'T SEEM TO CHANGE (STILL CUTS OFF)
+#######
+
 ##########
 ###   1. Cleaning out the tweets that got matched to a region based on SOLELY:
 ###       * A SHAKY LINK (e.g. patch.com, bradenton.com)

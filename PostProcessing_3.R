@@ -4,11 +4,6 @@
 ##    The SORTING (e.g. sort the ALREADY-ORDERED data set, SEE IF IT CHANGES IT..)
 #########
 
-source("Project_Functions.R")
-source("Project_Objects.R")
-
-load(file="topic.dfs.all.cleaned.tweets.RData")
-
 #######
 ## Obtain CONVERSATION THREADS from 
 ##  1. Original or Retweets (NOT REPLIES, as THOSE CAN'T ORIGINATE A THREAD), with AT LEAST 1 REPLY ("reply_count = 1")
@@ -17,6 +12,11 @@ load(file="topic.dfs.all.cleaned.tweets.RData")
 ##    b. and that THERE ARE POTENTIAL INCONSISTENCIES due to ACCOUNTS/POSTS being deleted, USERS BEING PRIVATE etc etc
 ##  3. Arrange them by date? NOT by "reply thread has to be clustered together"
 ## 
+
+source("Project_Functions.R")
+source("Project_Objects.R")
+
+load(file="topic.dfs.all.cleaned.tweets.RData")
 
 
 #######
@@ -273,7 +273,7 @@ for (l in 1:length(main.queries)){
   print(sapply(full.df[[l]], function(x) dim(x)))
 }
 
-save(full.df, file="topics.df.full.UNsorted.RData")
+save(full.df, file="topic.dfs.full.UNsorted.RData")
 
 
 #######
@@ -292,5 +292,5 @@ for (j in 1:length(area.terms)){
 }
 
 
-save(full.df, file="topics.df.full.sorted.RData")
+save(full.df, file="topic.dfs.full.sorted.RData")
 
