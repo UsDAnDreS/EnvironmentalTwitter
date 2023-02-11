@@ -12,9 +12,9 @@ source("Project_Functions.R")
 main.queries <- list(
   RedTide = '("red tide" OR "red tides" OR "red algae" OR #redtide OR "karenia brevis" OR kbrevis OR #kareniabrevis)',
   BlueGreen = '("blue green algae" OR "blue green algal" OR #bluegreenalgae OR "toxic green algae" OR cyanobacteria OR cyanotoxins OR Lyngbya OR Lyngbia OR Lingbia OR Lingbya OR Lynbia OR Lynbya OR Linbia OR Linbya OR Dapis)',
-  OilSpill = '((oil OR crude OR petroleum OR tar_ball OR tar_balls) (leak OR leaks OR leaked OR leaking OR leakage OR spill OR spills OR spilled OR spilling OR spillage) (ocean OR beach OR beaches OR bay OR gulf OR sea OR lake OR river OR creek OR waterway))',
-  SewageSpill = '((sewer OR sewers OR sewage OR septic OR stormwater OR storm_water) (untreated OR raw OR overflow OR discharge OR pump OR pumps OR pumping OR pumped OR leak OR leaks OR leaked OR leaking OR leakage OR spill OR spills OR spilled OR spilling OR spillage OR dump OR dumps OR dumped OR dumping) (ocean OR beach OR beaches OR bay OR gulf OR sea OR lake OR river OR creek OR waterway))',
-  IndustrialSpill = '((wastewater OR contaminants OR contamination OR contaminating OR chemical OR chemicals) (leak OR leaks OR leaked OR leaking OR leakage OR spill OR spills OR spilled OR spilling OR spillage) (ocean OR beach OR beaches OR bay OR gulf OR sea OR lake OR river OR creek OR waterway))',
+  OilSpill = '((oil OR crude OR petroleum OR "tar ball" OR "tar balls") (leak OR leaks OR leaked OR leaking OR leakage OR spill OR spills OR spilled OR spilling OR spillage) (ocean OR beach OR beaches OR bay OR gulf OR sea OR lake OR river OR creek OR waterway))',
+  SewageSpill = '((sewer OR sewers OR sewage OR septic OR stormwater OR "storm water" OR "reclaimed water" OR "reclaim water") (untreated OR raw OR overflow OR discharge OR discharges OR discharging OR discharged OR pump OR pumps OR pumping OR pumped OR leak OR leaks OR leaked OR leaking OR leakage OR spill OR spills OR spilled OR spilling OR spillage OR dump OR dumps OR dumped OR dumping) (ocean OR beach OR beaches OR bay OR gulf OR sea OR lake OR river OR creek OR waterway))',
+  IndustrialSpill = '((wastewater OR contaminants OR contamination OR contaminating OR chemical OR chemicals) (discharge OR discharges OR discharging OR discharged OR pump OR pumps OR pumping OR pumped OR leak OR leaks OR leaked OR leaking OR leakage OR spill OR spills OR spilled OR spilling OR spillage OR dump OR dumps OR dumped OR dumping) (ocean OR beach OR beaches OR bay OR gulf OR sea OR lake OR river OR creek OR waterway))',
   AllAlgae = '((algae OR algal OR #algaebloom OR #algalbloom OR #toxicalgae OR #harmfulalgae) OR ("red tide" OR "red tides" OR #redtide OR "karenia brevis" OR kbrevis OR #kareniabrevis) OR (#bluegreenalgae OR cyanobacteria OR cyanotoxins OR Lyngbya ORLyngbia OR Lingbia OR Lingbya OR Lynbia OR Lynbya OR Linbia OR Linbya OR Dapis))',
   HarmfulAlgaeBlooms = '(((toxic OR toxins OR harmful OR bloom OR blooms OR blooming) (algae OR algal) OR #algaebloom OR #algalbloom) OR (\"blue green algae\" OR \"blue green algal\" OR #bluegreenalgae OR \"toxic green algae\" OR cyanobacteria OR cyanotoxins OR Lyngbya OR Lyngbia OR Lingbia OR Lingbya OR Lynbia OR Lynbya OR Linbia OR Linbya OR Dapis) OR (\"red algae\" OR \"red tides\" OR \"red tide\" OR #redtide OR \"karenia brevis\" OR kbrevis OR #kareniabrevis))'
 )
@@ -108,54 +108,54 @@ area.terms <- list(
 
 Tampa.query.words <- c("Tampa", "Tampas", "#TampaBay", "TB area",
                        "Hillsborough", "HillsboroughCounty",
-                        "Apollo Beach", "#ApolloBeach", "Wimauma",
-                        "Gibsonton", "Ruskin", "Sun City",  "Hillsborough Bay",
-                        "Davis Islands", "Alafia River", "McKay Bay",
-                        "lake thonotosassa")
+                       "Apollo Beach", "#ApolloBeach", "Wimauma",
+                       "Gibsonton", "Ruskin", "Sun City",  "Hillsborough Bay",
+                       "Davis Islands", "Alafia River", "McKay Bay",
+                       "lake thonotosassa")
 
 
 Pinellas.Clearwater.query.words <- c("Pinellas", "PinellasCounty", "Clearwater", "Dunedin", "Clearwater Beach", "#ClearwaterBeach",
-"Indian Rocks Beach",  "#IndianRocksBeach",  "Tarpon Springs",  "#TarponSprings",  "Belleair",  "Palm Harbor",  "#PalmHarbor",  "Safety Harbor",  "#SafetyHarbor",
-"Honeymoon Island",  "Sand Key", "Caladesi",  "Lake Tarpon")
+                                     "Indian Rocks Beach",  "#IndianRocksBeach",  "Tarpon Springs",  "#TarponSprings",  "Belleair",  "Palm Harbor",  "#PalmHarbor",  "Safety Harbor",  "#SafetyHarbor",
+                                     "Honeymoon Island",  "Sand Key", "Caladesi",  "Lake Tarpon")
 
 
 # -\"Redington Beach\" -\"Redington Shores\" => "Redington" could just be added to Treasure Island/Tierra Verde in "FL OR Florda" chunk
 # Tierra Verde could be dropped if need be for space. Not super-popular, but included just in case.
 StPete.query.words <-  c("StPetersburg",  "St Petersburg",  "St Pete",  "StPete",  "#StPeteBeach",
- "Madeira Beach",  "#MadeiraBeach",  "Treasure Island", "Tierra Verde",  "Sunshine Skyway",
- "Fort De Soto",  "Fort DeSoto",  "Redington Beach",  "Redington Shores",  "Pass a grille",  "Boca Ciega Bay",
- "Egmont Key",  "Weedon Island")
+                         "Madeira Beach",  "#MadeiraBeach",  "Treasure Island", "Tierra Verde",  "Sunshine Skyway",
+                         "Fort De Soto",  "Fort DeSoto",  "Redington Beach",  "Redington Shores",  "Pass a grille",  "Boca Ciega Bay",
+                         "Egmont Key",  "Weedon Island")
 
 
 
 # The last few - Terra Ceia, Palma Sola Bay, Bishop Harbor - have been really low mentions. 
 # Could easily drop the off for space if need be.
 Manatee.query.words <- c("Manatee county",  "Manatee counties",  "ManateeCounty",  "Bradenton",  "Bradentons",  "#BradentonBeach",
- "Anna Maria Island",  "#AnnaMariaIsland",  "Longboat Key",  "#LongboatKey",  "Holmes Beach",  "#HolmesBeach",
- "Manatee River",  "#ManateeRiver",  "Port Manatee",  "Coquina Beach", 
- "Terra Ceia",
- "Palma Sola Bay", "Bishop Harbor",
- "lake manatee")
+                         "Anna Maria Island",  "#AnnaMariaIsland",  "Longboat Key",  "#LongboatKey",  "Holmes Beach",  "#HolmesBeach",
+                         "Manatee River",  "#ManateeRiver",  "Port Manatee",  "Coquina Beach", 
+                         "Terra Ceia",
+                         "Palma Sola Bay", "Bishop Harbor",
+                         "lake manatee")
 
 
 
 # #ManasotaKey, #CaseyKey, #LemonBay hashes are not that popular, could drop for space.
 # Watch for 'Sarasota Herald Tribune' in post processing: seemingly the only reference to the area.
 Sarasota.query.words <-  c("Sarasota",  "Sarasotas",  "SarasotaCounty",
- "Siesta Key Beach",  "#SiestaKeyBeach",
- "Venice", "Englewood", "North Port", "#NorthPort", "Lido Beach", "Casey Key",  "#CaseyKey",  "Nokomis",  "Lemon Bay",  "#LemonBay",  "St Armands",  "#StArmands",
- "Manasota Key",  "#ManasotaKey",  "Manasota Beach",  "Englewood Beach",  "Lido Key",
- "Caspersen Beach",  "Stump Pass",  "#SarasotaBay")
+                           "Siesta Key Beach",  "#SiestaKeyBeach",
+                           "Venice", "Englewood", "North Port", "#NorthPort", "Lido Beach", "Casey Key",  "#CaseyKey",  "Nokomis",  "Lemon Bay",  "#LemonBay",  "St Armands",  "#StArmands",
+                           "Manasota Key",  "#ManasotaKey",  "Manasota Beach",  "Englewood Beach",  "Lido Key",
+                           "Caspersen Beach",  "Stump Pass",  "#SarasotaBay")
 
 
 # That last line of places (Werner Boys, Three Rooker, Beacon)   very low mentions.. could easily drop if space is needed.
 # Elfers & Shady Hills are both pretty low on mentions   could also drop.
 # Pithlachascotee is really low mentions, but at least it's a water body (river).. could still drop it though.
 Pasco.query.words <-  c("Pasco county", "Pasco counties", "PascoCounty",
- "Port Richey",  "#PortRichey",
- "Bayonet Point", "Anclote", "Elfers", "Shady Hills",
- "Cotee River",  "Pithlachascotee",  "Jasmine Estates",  "Key Vista",  "Aripeka", 
- "Werner Boyce",  "Three Rooker Island",  "Beacon Square")
+                        "Port Richey",  "#PortRichey",
+                        "Bayonet Point", "Anclote", "Elfers", "Shady Hills",
+                        "Cotee River",  "Pithlachascotee",  "Jasmine Estates",  "Key Vista",  "Aripeka", 
+                        "Werner Boyce",  "Three Rooker Island",  "Beacon Square")
 
 
 area.words <- list(
@@ -253,7 +253,7 @@ StPete.query.tag
 
 
 Tampa.query.tag <- Mile.requirement.func(c("bounding_box:[-82.651060 27.933701 -82.053338 28.173745]",
-                                         "bounding_box:[-82.571997 27.643030 -82.054366 27.933701]"))
+                                           "bounding_box:[-82.571997 27.643030 -82.054366 27.933701]"))
 nchar(Tampa.query.tag)
 Tampa.query.tag
 
@@ -278,8 +278,8 @@ Tampa.query.tag
 # bounding_box:[-82.254526 27.208464 -82.052137 27.385798]
 
 Manatee.query.tag <- Mile.requirement.func(c("bounding_box:[-82.672178 27.542987 -82.052137 27.648263]",
-                                           "bounding_box:[-82.790968 27.385798 -82.052137 27.542987]",
-                                           "bounding_box:[-82.254526 27.208464 -82.052137 27.385798]"))
+                                             "bounding_box:[-82.790968 27.385798 -82.052137 27.542987]",
+                                             "bounding_box:[-82.254526 27.208464 -82.052137 27.385798]"))
 nchar(Manatee.query.tag)
 Manatee.query.tag
 

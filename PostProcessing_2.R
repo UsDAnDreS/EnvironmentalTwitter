@@ -19,8 +19,8 @@ library(tidyverse)
 load(file="topic.dfs.non.retweets.expanded.urls.RData")
 
 
-    
-    
+
+
 
 for (l in 1:length(main.queries)){
   print(sapply(topic.dfs[[l]], function(x) dim(x)))
@@ -103,11 +103,11 @@ shaky.terms <- list(Tampa = c("Tampa Bay Times",        # Yep, gotta post-filter
                     PinellasClearwater = c(),
                     PinellasStPete = c(
                       #"St Pete Catalyst", "stpetecatalyst      # These are mostly local, should be fine
-                      ),  
+                    ),  
                     Manatee = c("Bradenton Herald"),   # NEED TO MIX IN with the LINKS ABOVE RIGHT AWAY (otherwise it would mistakenly retain a tweet)
                     Sarasota = c("Sarasota Magazine", "Sarasota Herald", "sarasotamagazine"),
                     Pasco = c()
-                    )
+)
 
 
 ## Unreliable links for each location
@@ -132,16 +132,16 @@ for (l in 1:length(topic.dfs)){
   print(paste0("Topic #: ", l, ", ", names(topic.dfs)[l]))
   
   
-for (j in 1:length(shaky.links)){
-  
-  # If there's no tweets
-  if (nrow(topic.dfs[[l]][[j]]) == 0) next;
-  
-  # If there's no shaky links/terms
-  if (length(shaky.links[[j]]) == 0 & length(shaky.terms[[j]]) == 0) next;
-  
- # for (link in shaky.links[[j]]){
-  
+  for (j in 1:length(shaky.links)){
+    
+    # If there's no tweets
+    if (nrow(topic.dfs[[l]][[j]]) == 0) next;
+    
+    # If there's no shaky links/terms
+    if (length(shaky.links[[j]]) == 0 & length(shaky.terms[[j]]) == 0) next;
+    
+    # for (link in shaky.links[[j]]){
+    
     # link.pattern <- ifelse(is.na(link), "", paste(unlist(strsplit(shaky.links[[j]], split="\\W")), collapse=" "))
     link.pattern <- sapply(shaky.links[[j]], function(x) paste(unlist(strsplit(x, split="\\W")), collapse=" "))
     names(link.pattern) <- NULL
@@ -163,11 +163,11 @@ for (j in 1:length(shaky.links)){
     good.ind
     #  View(data.frame(topic.dfs[[l]][[j]]$text[bad.ind]))
     #  View(data.frame(topic.dfs[[l]][[j]]$text[good.ind]))
-     
+    
     topic.dfs[[l]][[j]]$actual_url_link[good.ind]
     
     if (length(bad.ind) > 0) topic.dfs[[l]][[j]] <- topic.dfs[[l]][[j]][-bad.ind, ]
-
+    
   }
 }
 
@@ -186,34 +186,34 @@ always.shaky.in.text
 for (l in 1:length(topic.dfs)){
   print(paste0("Topic #: ", l, ", ", names(topic.dfs)[l]))
   
-for (j in 1:length(query.terms)){
-  
-  # If there's no tweets
-  if (nrow(topic.dfs[[l]][[j]]) == 0) next;
-  
-  for (link in always.shaky.in.text){
-    link.pattern <- link
+  for (j in 1:length(query.terms)){
     
-    hey <- postprocess.badterm.cleanup(topic.dfs[[l]][[j]]$text, bad.terms = link.pattern, grep.terms = query.terms[[j]])
-    length(hey)
-    names(hey$actual.inds) <- NULL
-    names(hey$ind.drop) <- NULL
-       
-    # If there are no "bad" matches
-    if (length(hey$ind.drop) == 0) next;
+    # If there's no tweets
+    if (nrow(topic.dfs[[l]][[j]]) == 0) next;
     
-    bad.ind <- hey$actual.inds[hey$ind.drop]
-    good.ind <- hey$actual.inds[!hey$ind.drop]
-    bad.ind
-    good.ind
-    # View(data.frame(topic.dfs[[l]][[j]]$text[bad.ind]))
-    # View(data.frame(topic.dfs[[l]][[j]]$text[good.ind]))
-    topic.dfs[[l]][[j]]$actual_url_link[good.ind]
-    
-    if (length(bad.ind) > 0) topic.dfs[[l]][[j]] <- topic.dfs[[l]][[j]][-bad.ind, ]
-    
+    for (link in always.shaky.in.text){
+      link.pattern <- link
+      
+      hey <- postprocess.badterm.cleanup(topic.dfs[[l]][[j]]$text, bad.terms = link.pattern, grep.terms = query.terms[[j]])
+      length(hey)
+      names(hey$actual.inds) <- NULL
+      names(hey$ind.drop) <- NULL
+      
+      # If there are no "bad" matches
+      if (length(hey$ind.drop) == 0) next;
+      
+      bad.ind <- hey$actual.inds[hey$ind.drop]
+      good.ind <- hey$actual.inds[!hey$ind.drop]
+      bad.ind
+      good.ind
+      # View(data.frame(topic.dfs[[l]][[j]]$text[bad.ind]))
+      # View(data.frame(topic.dfs[[l]][[j]]$text[good.ind]))
+      topic.dfs[[l]][[j]]$actual_url_link[good.ind]
+      
+      if (length(bad.ind) > 0) topic.dfs[[l]][[j]] <- topic.dfs[[l]][[j]][-bad.ind, ]
+      
+    }
   }
-}
 }
 
 
@@ -241,7 +241,7 @@ load("topic.dfs.RData")
 
 ### For retweets that correspond to a "good" original tweet, we
 ###   1. Create a list of their corresponding good original tweet IDs
-###   2. Left-join that list with "id, text, tweet_url_link, actual_url_link" or the cleaned-up data set
+###   2. Left-join that list with "id, text, text_with_display_links" of the cleaned-up data set
 ###   3. That gives us a properly-ordered "fill-in" of text/url-info, 
 ##      we proceed to FILL IT into the retweet data that corresponds to good original tweets.
 ##     (instead of their original data)
@@ -254,49 +254,55 @@ for (l in 1:length(topic.dfs)){
   
   both.tweets.and.retweets[[l]] <- list()
   
-for (j in 1:length(area.terms)){
-  dim(topic.dfs[[l]][[j]])
-  
-  good.ind <- which(((sapply(topic.dfs[[l]][[j]]$referenced_tweets, function(x) ifelse(length(x) > 0, x['type'][1], "not retweeted")) == "retweeted") & 
-             (sapply(topic.dfs[[l]][[j]]$referenced_tweets, function(x) ifelse(length(x) > 0, x['id'][1], "none")) %in% good.tweet.ids[[l]][[j]])))
-  length(good.ind)
-  
-  # If there are no good retweets, just record the original tweets
-  if (length(good.ind) == 0) {
-    both.tweets.and.retweets[[l]][[j]] <- all.cleaned.topic.dfs[[l]][[j]]
-    next;
+  for (j in 1:length(area.terms)){
+    dim(topic.dfs[[l]][[j]])
+    
+    good.ind <- which(((sapply(topic.dfs[[l]][[j]]$referenced_tweets, function(x) ifelse(length(x) > 0, x['type'][1], "not retweeted")) == "retweeted") & 
+                         (sapply(topic.dfs[[l]][[j]]$referenced_tweets, function(x) ifelse(length(x) > 0, x['id'][1], "none")) %in% good.tweet.ids[[l]][[j]])))
+    length(good.ind)
+    
+    # If there are no good retweets, just record the original tweets
+    if (length(good.ind) == 0) {
+      both.tweets.and.retweets[[l]][[j]] <- all.cleaned.topic.dfs[[l]][[j]]
+      next;
     }
     
-  all.good.retweets <- topic.dfs[[l]][[j]][good.ind,]
-  
-  hoi <- data.frame(id=unlist(sapply(all.good.retweets$referenced_tweets, function(x) ifelse(length(x) > 0, x['id'][1], "none"))))
-  #dim(hoi)
-  hey <- hoi %>% left_join(all.cleaned.topic.dfs[[l]][[j]] %>% dplyr::select(id, text, text_with_display_links),
-                           by="id")
-  #dim(hey)
-  # View(hey)
-
-  
-  all.good.retweets$text_with_display_links <- hey$text_with_display_links
-  
-  # nrow(all.good.retweets)
-  # length(unique(all.good.retweets$id))
- #  nrow(all.cleaned.topic.dfs[[l]][[j]])
- #  length(unique(all.cleaned.topic.dfs[[l]][[j]]$id))
-  
-  all.cleaned.topic.dfs[[l]][[j]]$created_at.x
-  
-  ## HAD TO SWITCH "rbind()" OUT FOR "bind_rows()"
-  ## Because the former didn't work for fancier data frames with variables that take on list values
-  both.tweets.and.retweets[[l]][[j]] <- bind_rows(all.cleaned.topic.dfs[[l]][[j]],
-                                                  all.good.retweets)
-  
-  both.tweets.and.retweets[[l]][[j]] <- arrange(both.tweets.and.retweets[[l]][[j]], 
-                                                desc(created_at.x))
-  
-  
-  
-}
+    all.good.retweets <- topic.dfs[[l]][[j]][good.ind,]
+    
+    hoi <- data.frame(id=unlist(sapply(all.good.retweets$referenced_tweets, function(x) ifelse(length(x) > 0, x['id'][1], "none"))))
+    #dim(hoi)
+    hey <- hoi %>% left_join(all.cleaned.topic.dfs[[l]][[j]] %>% dplyr::select(id, text, text_with_display_links),
+                             by="id")
+    #dim(hey)
+    # View(hey)
+    # View(all.good.retweets)
+    
+    ## Retaining the "RT @...:" part, but replacing the following chunk with the full text of the original tweet
+    ##    (First we split away the "RT @... :" part
+    rt.at.part <- sapply(all.good.retweets$text, function(x) str_split(x, ":")[[1]][1])
+    ##    (Second we paste it with 1) the unwound-url text; 2) the "display url" text;)
+    all.good.retweets$text <- apply(cbind(rt.at.part, hey$text), 1, function(x) paste(x[1], x[2], sep = ": "))
+    all.good.retweets$text_with_display_links <- apply(cbind(rt.at.part, hey$text_with_display_links), 1, function(x) paste(x[1], x[2], sep = ": "))
+    View(all.good.retweets)
+    
+    # nrow(all.good.retweets)
+    # length(unique(all.good.retweets$id))
+    #  nrow(all.cleaned.topic.dfs[[l]][[j]])
+    #  length(unique(all.cleaned.topic.dfs[[l]][[j]]$id))
+    
+    all.cleaned.topic.dfs[[l]][[j]]$created_at.x
+    
+    ## HAD TO SWITCH "rbind()" OUT FOR "bind_rows()"
+    ## Because the former didn't work for fancier data frames with variables that take on list values
+    both.tweets.and.retweets[[l]][[j]] <- bind_rows(all.cleaned.topic.dfs[[l]][[j]],
+                                                    all.good.retweets)
+    
+    both.tweets.and.retweets[[l]][[j]] <- arrange(both.tweets.and.retweets[[l]][[j]], 
+                                                  desc(created_at.x))
+    
+    
+    
+  }
 }
 
 

@@ -60,8 +60,8 @@ for (l in 1:length(topic.dfs.geotag)){
     print(i)
     
     # In case it's not a DF or list, meaning that it's probably a "None" character object (no tweets), skip to the next
-    if (!(class(topic.dfs.geotag[[l]][[j]])[1] %in% c("data.frame", "list"))) next;
-      
+    if (!(class(topic.dfs.geotag[[l]][[i]])[1] %in% c("data.frame", "list"))) next;
+    
     ## Excluding Retweets
     ## (using the "referenced_tweets" field)
     topic.dfs.geotag[[l]][[i]] <- topic.dfs.geotag[[l]][[i]][!(sapply(topic.dfs.geotag[[l]][[i]]$referenced_tweets, function(x) ifelse(length(x) > 0, x['type'][1], "not retweeted")) == "retweeted"),]
@@ -158,15 +158,15 @@ for (l in 1:length(topic.dfs.geotag)){
     ## Disposing of the "post ?" stuff in the links, which seems mostly to be analytics ("utm" stuff; via "strsplit(...)" part)
     # hop <- topic.dfs.geotag[[l]][[i]]$entities.x_urls
     topic.dfs.geotag[[l]][[i]]$entities.x_urls <- lapply(topic.dfs.geotag[[l]][[i]]$entities.x_urls, 
-                                                  function(x) if (!is.null(x)){
-                                                    x %>% left_join(unique.display.and.expanded.urls.df, 
-                                                                    by=intersect(colnames(x), colnames(unique.display.and.expanded.urls.df))) %>% 
-                                                      mutate(expanded_url = sapply(strsplit(ifelse(is.na(actual_expanded_url), expanded_url, actual_expanded_url), split="\\?"),
-                                                                                   function(x) x[1])) %>% 
-                                                      select(-actual_expanded_url)
-                                                  } else {
-                                                    NULL
-                                                  }
+                                                         function(x) if (!is.null(x)){
+                                                           x %>% left_join(unique.display.and.expanded.urls.df, 
+                                                                           by=intersect(colnames(x), colnames(unique.display.and.expanded.urls.df))) %>% 
+                                                             mutate(expanded_url = sapply(strsplit(ifelse(is.na(actual_expanded_url), expanded_url, actual_expanded_url), split="\\?"),
+                                                                                          function(x) x[1])) %>% 
+                                                             select(-actual_expanded_url)
+                                                         } else {
+                                                           NULL
+                                                         }
     )
     
     
@@ -177,8 +177,8 @@ for (l in 1:length(topic.dfs.geotag)){
     
     # Accumulating all the links per each tweet into one string
     all_expanded_links_in_one_string <- sapply(topic.dfs.geotag[[l]][[i]]$entities.x_urls, function(x) paste0(sapply(unique(x$expanded_url),
-                                                                                                              function(x) ifelse(is.na(x), "", paste(unlist(strsplit(x, split="\\W")), collapse=" "))),
-                                                                                                       collapse =". "))
+                                                                                                                     function(x) ifelse(is.na(x), "", paste(unlist(strsplit(x, split="\\W")), collapse=" "))),
+                                                                                                              collapse =". "))
     # View(data.frame(all_expanded_links_in_one_string))
     
     # l <- 1; i <- 1
@@ -189,8 +189,8 @@ for (l in 1:length(topic.dfs.geotag)){
     
     # Attaching the link-string to the original text of the tweet (from which the display_url has been stripped already)
     topic.dfs.geotag[[l]][[i]]$text <- paste(topic.dfs.geotag[[l]][[i]]$text, 
-                                      all_expanded_links_in_one_string,
-                                      sep =". ")
+                                             all_expanded_links_in_one_string,
+                                             sep =". ")
     
     dim(topic.dfs.geotag[[l]][[i]])
     

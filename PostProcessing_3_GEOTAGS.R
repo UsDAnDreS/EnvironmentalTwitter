@@ -17,7 +17,7 @@ load("topic.dfs.geotag.full.sorted.RData")
 
 for (l in 1:length(main.queries)){
   print(names(main.queries)[l])
- # print(sapply(full.df[[l]], function(x) dim(x)))
+  # print(sapply(full.df[[l]], function(x) dim(x)))
   print(sum(sapply(full.df[[l]], function(x) ifelse(is.data.frame(x), dim(x)[1], 0))))
 }
 
@@ -36,8 +36,8 @@ save(full.df, file="Data/topic.dfs.geotag.full.sorted.RData")
 for (l in 1:length(full.df)){
   for (k in 1:length(full.df[[l]])){
     if (!is.character(full.df[[l]][[k]])){
-    write.csv(full.df[[l]][[k]][, which(unlist(sapply(full.df[[l]][[k]], function(x) !(class(x)[1] %in% c("data.frame", "list")))))],
-              paste0("Data/Geotag_",names(main.queries)[l], "_", names(area.terms)[k], "_", "all_SIMPLE_columns.csv"))
+      write.csv(full.df[[l]][[k]][, which(unlist(sapply(full.df[[l]][[k]], function(x) !(class(x)[1] %in% c("data.frame", "list")))))],
+                paste0("Data/Geotag_",names(main.queries)[l], "_", names(area.terms)[k], "_", "all_SIMPLE_columns.csv"))
     }
   }
 }

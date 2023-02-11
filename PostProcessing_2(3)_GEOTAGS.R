@@ -64,9 +64,9 @@ for (l in 1:length(main.queries)){
     # For the NON-EMPTY tweet loads
     if (class(topic.dfs.geotag[[l]][[j]])[1] %in% c("data.frame", "list")){
       
-    conversation_ids[[l]][[j]] <- topic.dfs.geotag[[l]][[j]]$conversation_id[is.na(topic.dfs.geotag[[l]][[j]]$in_reply_to_user_id)
-                                                                                     & (topic.dfs.geotag[[l]][[j]]$public_metrics.x_reply_count > 0)]
-    
+      conversation_ids[[l]][[j]] <- topic.dfs.geotag[[l]][[j]]$conversation_id[is.na(topic.dfs.geotag[[l]][[j]]$in_reply_to_user_id)
+                                                                               & (topic.dfs.geotag[[l]][[j]]$public_metrics.x_reply_count > 0)]
+      
     } else {
       # If not - empty data frame
       conversation_ids[[l]][[j]] <- data.frame()
@@ -236,9 +236,9 @@ for (l in 1:length(main.queries)){
     cat("\n")
     
     if (class(topic.dfs.geotag[[l]][[j]])[1] %in% c("data.frame", "list")){
-    print(paste0("Dataset size without conversations: ", 
-                 nrow(topic.dfs.geotag[[l]][[j]]), ", ", 
-                 length(unique(topic.dfs.geotag[[l]][[j]]$id))))
+      print(paste0("Dataset size without conversations: ", 
+                   nrow(topic.dfs.geotag[[l]][[j]]), ", ", 
+                   length(unique(topic.dfs.geotag[[l]][[j]]$id))))
     }
     
     # If there were no conversations added, then just keep as is and move onto the next.
@@ -248,9 +248,9 @@ for (l in 1:length(main.queries)){
       full.df[[l]][[j]] <- topic.dfs.geotag[[l]][[j]];
       
       if (class(topic.dfs.geotag[[l]][[j]])[1] %in% c("data.frame", "list")){
-      print(paste0("Dataset size with conversations:", 
-                   nrow(full.df[[l]][[j]]), ", ", 
-                   length(unique(full.df[[l]][[j]]$id))))
+        print(paste0("Dataset size with conversations:", 
+                     nrow(full.df[[l]][[j]]), ", ", 
+                     length(unique(full.df[[l]][[j]]$id))))
       }
       next;
     }
@@ -260,8 +260,8 @@ for (l in 1:length(main.queries)){
                  length(unique(df[[l]][[j]]$id))))
     
     full.df[[l]][[j]] <- topic.dfs.geotag[[l]][[j]] %>% full_join(df[[l]][[j]],
-                                                                          by=intersect(colnames(topic.dfs.geotag[[l]][[j]]),
-                                                                                       colnames(df[[l]][[j]])))
+                                                                  by=intersect(colnames(topic.dfs.geotag[[l]][[j]]),
+                                                                               colnames(df[[l]][[j]])))
     
     ## Getting rid of potential duplicates as a result of joining
     #   Duplicates arise due to potential: edit history, changes in follower numbers, account tweet counts, tweet engagement metrics, etc
@@ -297,10 +297,10 @@ for (l in 1:length(main.queries)){
     ## 
     
     if (class(full.df[[l]][[j]])[1] %in% c("data.frame", "list")){
-    print(all_equal(full.df[[l]][[j]] %>% mutate(created_at.x = as.POSIXct(created_at.x, tz = "UTC", "%Y-%m-%dT%H:%M:%OS")),
-                    full.df[[l]][[j]] %>% mutate(created_at.x = as.POSIXct(created_at.x, tz = "UTC", "%Y-%m-%dT%H:%M:%OS")) %>% arrange(created_at.x)))
-    
-    full.df[[l]][[j]] <- full.df[[l]][[j]] %>% mutate(created_at.x = as.POSIXct(created_at.x, tz = "UTC", "%Y-%m-%dT%H:%M:%OS")) %>% arrange(created_at.x)
+      print(all_equal(full.df[[l]][[j]] %>% mutate(created_at.x = as.POSIXct(created_at.x, tz = "UTC", "%Y-%m-%dT%H:%M:%OS")),
+                      full.df[[l]][[j]] %>% mutate(created_at.x = as.POSIXct(created_at.x, tz = "UTC", "%Y-%m-%dT%H:%M:%OS")) %>% arrange(created_at.x)))
+      
+      full.df[[l]][[j]] <- full.df[[l]][[j]] %>% mutate(created_at.x = as.POSIXct(created_at.x, tz = "UTC", "%Y-%m-%dT%H:%M:%OS")) %>% arrange(created_at.x)
     }
   }
 }

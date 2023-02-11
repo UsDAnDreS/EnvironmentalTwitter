@@ -6,6 +6,10 @@ library(tidyverse)
 # https://developer.twitter.com/en/docs/twitter-api/data-dictionary/object-model/user
 # https://developer.twitter.com/en/docs/twitter-api/data-dictionary/object-model/place
 
+
+# Replace the bearer token below with
+bearer_token = "AAAAAAAAAAAAAAAAAAAAAIz1dwEAAAAAmC7OAMvDF4b4rWtGOrcbJIu5dbU%3DaZWJv0ZMt9oY1PcKLYjsrlvWQoq42sYe3etHPdOERaCjNepFMb"
+
 headers = c(
   `Authorization` = sprintf('Bearer %s', bearer_token)
 )
