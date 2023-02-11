@@ -12,7 +12,11 @@
 source("Project_Functions.R")
 source("Project_Objects.R")
 
-load("topic.dfs.geotag.full.sorted.RData")
+# Before unwounding the reply urls
+# load("topic.dfs.geotag.full.sorted.RData")
+
+# With unwounding the reply urls
+load("topic.dfs.geotag.full.sorted.url.unwound.RData")
 
 
 for (l in 1:length(main.queries)){
@@ -30,7 +34,7 @@ for (l in 1:length(full.df)) names(full.df[[l]]) <- names(area.terms)
 
 # "created_at" has a DOUBLE-TYPE of LENGTH 2 ("POSIXct" "POSIXt")
 dir.create("Data")
-save(full.df, file="Data/topic.dfs.geotag.full.sorted.RData")
+save(full.df, file="Data/topic.dfs.geotag.full.sorted.url.unwound.RData")
 
 
 for (l in 1:length(full.df)){
