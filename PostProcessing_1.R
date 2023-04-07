@@ -1,7 +1,11 @@
 #########
-## NOTE (SOMETHING TO THINK ABOUT):
-##    MIGHT WANT TO CAREFULLY RETHINK THE INCORPORATION OF THE LINKS INTO THE TEXT...
-##   (GIVEN THAT SOME OF THEM ARE NON-INFORMATIVE, and could CLOG UP SENTIMENT ANALYSIS/WORD CLOUDS ETC ETC)
+## APRIL 7th, 2023:
+##    NOTE (SOMETHING TO THINK ABOUT):
+##        MIGHT WANT TO CAREFULLY RETHINK THE INCORPORATION OF THE LINKS INTO THE TEXT...
+##        (GIVEN THAT SOME OF THEM ARE NON-INFORMATIVE, and could CLOG UP SENTIMENT ANALYSIS/WORD CLOUDS ETC ETC)
+##
+##   NOTE:
+##      Quotes are not treated as retweets. They are retained for analysis of original text.
 ##########
 
 
@@ -57,9 +61,29 @@ for (l in 1:length(topic.dfs)){
     
     ## Excluding Retweets
     ## (using the "referenced_tweets" field)
+    
+    # Replies + quotes: 
+    # These just start with @'s, but no indication of a "retweet" (
+    #   https://twitter.com/jimstinson/status/1565124120123154433
+    #  @AP Remember when @BarbraStreisand blamed a 2018 FL red tide on Florida Republicans? Meanwhile, no red tide so far in Tampa.  \n\nhttps://t.co/UarMBNnH75
+    #  )
+    # 
+    #View(topic.dfs[[l]][[i]][sapply(topic.dfs[[l]][[i]]$referenced_tweets, function(x) length(x[[1]])) == 2] %>% select(referenced_tweets))
+    
+    
+    # Pure quotes:
+    # Those don't start with "RT @", the quoted tweet is just mentioned at the end
+    #   View(topic.dfs[[l]][[i]][sapply(topic.dfs[[l]][[i]]$referenced_tweets, function(x) ifelse(length(x[[1]]) == 1, x['type'][1] == "quoted", FALSE)), ] %>% select(id, text, referenced_tweets))
+    
+    
     topic.dfs[[l]][[i]] <- topic.dfs[[l]][[i]][!(sapply(topic.dfs[[l]][[i]]$referenced_tweets, function(x) ifelse(length(x) > 0, x['type'][1], "not retweeted")) == "retweeted"),]
     ## That's an ERROR-PRONE way, could get false positives
     # topic.dfs[[l]][[i]] <- topic.dfs[[l]][[i]][-grep("RT ", topic.dfs[[l]][[i]]$text), ]
+    
+    # Checking afterwards:
+    #  QUOTES ARE RETAINED as NON-RETWEETS:
+    #     table(unlist(sapply(topic.dfs[[l]][[i]]$referenced_tweets, function(x) ifelse(length(x) > 0, x['type'][1], "not retweeted"))))
+    #     View(topic.dfs[[l]][[i]][sapply(topic.dfs[[l]][[i]]$referenced_tweets, function(x) ifelse(length(x[[1]]) == 1, x['type'][1] == "quoted", FALSE)), ] %>% select(id, text, referenced_tweets))
     
     
     ## There could be a "retweet-only" data chunk, so...
