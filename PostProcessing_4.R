@@ -40,8 +40,8 @@ save(full.df, file="Data/topic.dfs.full.sorted.url.unwound.RData")
 for (l in 1:length(full.df)){
   for (k in 1:length(full.df[[l]])){
     if (!is.character(full.df[[l]][[k]])){
-      write.csv(full.df[[l]][[k]][, which(unlist(sapply(full.df[[l]][[k]], function(x) !(class(x)[1] %in% c("data.frame", "list")))))],
-                paste0("Data/",names(main.queries)[l], "_", names(area.terms)[k], "_", "all_SIMPLE_columns.csv"))
+    write.csv(full.df[[l]][[k]][, which(unlist(sapply(full.df[[l]][[k]], function(x) !(class(x)[1] %in% c("data.frame", "list")))))],
+              paste0("Data/",names(main.queries)[l], "_", names(area.terms)[k], "_", "all_SIMPLE_columns.csv"))
     }
   }
 }

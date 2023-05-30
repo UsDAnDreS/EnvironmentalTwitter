@@ -59,63 +59,63 @@ for (l in 1:length(main.queries)){
   
   conversation_ids[[l]] <- all_queries[[l]] <- list()
   
-  for (j in 1:length(area.terms)){
-    print(j)
+for (j in 1:length(area.terms)){
+  print(j)
+
+  # Only including tweets that have NA in "in_reply_to_user_id" field (that would exclude all the replies which can't originate a thread),
+  #   and that themselves have a reply_count of at least 1
+  
+  conversation_ids[[l]][[j]] <- both.tweets.and.retweets[[l]][[j]]$conversation_id[is.na(both.tweets.and.retweets[[l]][[j]]$in_reply_to_user_id)
+ & (both.tweets.and.retweets[[l]][[j]]$public_metrics.x_reply_count > 0)]
+  
+   full.query <-  NULL
+  
+   # If no conversations - assign "None", next iteration.
+   if (length(conversation_ids[[l]][[j]]) == 0){
+     all_queries[[l]][[j]] <- "None"
+     next;
+   }
+   
+  i <- 0
+  
+  ## While index is less than the total of conversation id's, keep creating queries
+  ##  Each query should be no longer than 1024;
+  ##  eventual result ("conversation_ids[[l]][[j]]") will have a VECTOR of QUERIES,
+  ##  that exhausts the entirety of all conversation id's
+  
+  while (i <= length(conversation_ids[[l]][[j]])){
     
-    # Only including tweets that have NA in "in_reply_to_user_id" field (that would exclude all the replies which can't originate a thread),
-    #   and that themselves have a reply_count of at least 1
+    print(i)
     
-    conversation_ids[[l]][[j]] <- both.tweets.and.retweets[[l]][[j]]$conversation_id[is.na(both.tweets.and.retweets[[l]][[j]]$in_reply_to_user_id)
-                                                                                     & (both.tweets.and.retweets[[l]][[j]]$public_metrics.x_reply_count > 0)]
+    flag <- 0
+    i <- i+1
     
-    full.query <-  NULL
-    
-    # If no conversations - assign "None", next iteration.
-    if (length(conversation_ids[[l]][[j]]) == 0){
-      all_queries[[l]][[j]] <- "None"
-      next;
-    }
-    
-    i <- 0
-    
-    ## While index is less than the total of conversation id's, keep creating queries
-    ##  Each query should be no longer than 1024;
-    ##  eventual result ("conversation_ids[[l]][[j]]") will have a VECTOR of QUERIES,
-    ##  that exhausts the entirety of all conversation id's
-    
-    while (i <= length(conversation_ids[[l]][[j]])){
-      
-      print(i)
-      
-      flag <- 0
+    interm.query <- paste0("(conversation_id:", conversation_ids[[l]][[j]][i], sep=" ")
+
+    repeat{
       i <- i+1
-      
-      interm.query <- paste0("(conversation_id:", conversation_ids[[l]][[j]][i], sep=" ")
-      
-      repeat{
-        i <- i+1
-        # If iterations reached the maximum, drop out, mark it with a flag.
-        if (i > length(conversation_ids[[l]][[j]])) {flag <- 1; break;}
-        # If adding this ID doesn't overlow the "1024" character limit, go ahead. Otherwise, drop out of the loop.
-        if ((nchar(paste0(interm.query, paste0("OR conversation_id:", conversation_ids[[l]][[j]][i], ")", sep=" "), collapse=" "))) > 1024) break;
-        interm.query <- paste0(interm.query, paste0("OR conversation_id:", conversation_ids[[l]][[j]][i], sep=" "), collapse=" ")
-      }
-      
-      if (flag == 0) i <- i-1
-      
-      ## Cutting out the final " ", and then replacing it with ")"
-      interm.query <- substr(interm.query, 1, nchar(interm.query)-1)
-      interm.query <- paste0(interm.query, ")")
-      
-      # Attach the new interm query to the other available ones. Refresh the "interm.query" variable
-      full.query <- c(full.query, interm.query)
-      interm.query <- "("
-      
+      # If iterations reached the maximum, drop out, mark it with a flag.
+      if (i > length(conversation_ids[[l]][[j]])) {flag <- 1; break;}
+      # If adding this ID doesn't overlow the "1024" character limit, go ahead. Otherwise, drop out of the loop.
+      if ((nchar(paste0(interm.query, paste0("OR conversation_id:", conversation_ids[[l]][[j]][i], ")", sep=" "), collapse=" "))) > 1024) break;
+      interm.query <- paste0(interm.query, paste0("OR conversation_id:", conversation_ids[[l]][[j]][i], sep=" "), collapse=" ")
     }
     
-    all_queries[[l]][[j]] <- full.query
+    if (flag == 0) i <- i-1
     
+    ## Cutting out the final " ", and then replacing it with ")"
+    interm.query <- substr(interm.query, 1, nchar(interm.query)-1)
+    interm.query <- paste0(interm.query, ")")
+    
+    # Attach the new interm query to the other available ones. Refresh the "interm.query" variable
+    full.query <- c(full.query, interm.query)
+    interm.query <- "("
+  
   }
+  
+  all_queries[[l]][[j]] <- full.query
+  
+}
 }
 
 # paste0("conversation_id:", conversation_ids[[1]], collapse=" ")
@@ -137,57 +137,57 @@ for (l in 1:length(main.queries)){
   
   df[[l]] <- list()  
   
-  for (j in 1:length(area.terms)){
-    
-    # If there were no conversation ids:
-    if (all_queries[[l]][[j]] == "None"){
-      df[[l]][[j]] <- "None";
-      next;
-    }
-    
-    
-    for (query in all_queries[[l]][[j]]){
-      
-      print(j)
-      
-      geo.string <- area.terms[[j]]
-      
-      params = list(
-        `query` = paste(#'lang:en', 
-          query
-        ), 
-        `max_results` = '100',
-        `start_time` = '2018-01-01T00:00:00Z',
-        `media.fields` = 'url',
-        `tweet.fields` = 'attachments,author_id,context_annotations,conversation_id,created_at,entities,geo,in_reply_to_user_id,lang,possibly_sensitive,public_metrics,referenced_tweets,reply_settings,source',
-        `user.fields` = 'created_at,description,entities,id,location,name,pinned_tweet_id,profile_image_url,protected,public_metrics,url,verified,withheld',
-        `expansions` = 'geo.place_id,author_id'
-        ,`place.fields` = 'contained_within,country,country_code,full_name,geo,id,name,place_type'
-      )
-      
-      inter.query <- query_twitter(params,0)
-      
-      if (is.null(inter.query)){
-        if (length(df[[l]]) < j) {
-          df[[l]][[j]] <- "None"
-        } 
-      } else {
-        if (length(df[[l]]) < j) {
-          df[[l]][[j]] <- inter.query
-        } else {
-          # Instead of rbind, do full_join, in case of different colnames
-          df[[l]][[j]] <- df[[l]][[j]] %>%  full_join(inter.query,
-                                                      by=intersect(colnames(df[[l]][[j]]), 
-                                                                   colnames(inter.query)))
-        }
-      }
-      
-      
-      # unique(colnames(df[[l]][[j]]))
-      # View(df[[l]][[j]])
-      dim(df[[l]][[j]])
-    }
+for (j in 1:length(area.terms)){
+
+  # If there were no conversation ids:
+  if (all_queries[[l]][[j]] == "None"){
+    df[[l]][[j]] <- "None";
+    next;
   }
+  
+  
+  for (query in all_queries[[l]][[j]]){
+    
+  print(j)
+  
+  geo.string <- area.terms[[j]]
+  
+  params = list(
+    `query` = paste(#'lang:en', 
+      query
+    ), 
+    `max_results` = '100',
+    `start_time` = '2018-01-01T00:00:00Z',
+    `media.fields` = 'url',
+    `tweet.fields` = 'attachments,author_id,context_annotations,conversation_id,created_at,entities,geo,in_reply_to_user_id,lang,possibly_sensitive,public_metrics,referenced_tweets,reply_settings,source',
+    `user.fields` = 'created_at,description,entities,id,location,name,pinned_tweet_id,profile_image_url,protected,public_metrics,url,verified,withheld',
+    `expansions` = 'geo.place_id,author_id'
+    ,`place.fields` = 'contained_within,country,country_code,full_name,geo,id,name,place_type'
+  )
+  
+  inter.query <- query_twitter(params,0)
+  
+  if (is.null(inter.query)){
+    if (length(df[[l]]) < j) {
+      df[[l]][[j]] <- "None"
+    } 
+  } else {
+      if (length(df[[l]]) < j) {
+        df[[l]][[j]] <- inter.query
+        } else {
+            # Instead of rbind, do full_join, in case of different colnames
+            df[[l]][[j]] <- df[[l]][[j]] %>%  full_join(inter.query,
+                                                        by=intersect(colnames(df[[l]][[j]]), 
+                                                                     colnames(inter.query)))
+        }
+  }
+  
+  
+  # unique(colnames(df[[l]][[j]]))
+  # View(df[[l]][[j]])
+  dim(df[[l]][[j]])
+}
+}
 }
 
 ### Double-checking the conversation ids, after we obtain the actual tweet loads:
@@ -225,48 +225,61 @@ full.df <- list()
 for (l in 1:length(main.queries)){
   
   full.df[[l]] <- list()  
+
+for (j in 1:length(area.terms)){
+  print(paste0("Query: ", l, ";  Area: ", j))
+  cat("\n")
+  print(paste0("Dataset size without conversations: ", 
+               nrow(both.tweets.and.retweets[[l]][[j]]), ", ", 
+               length(unique(both.tweets.and.retweets[[l]][[j]]$id))))
   
-  for (j in 1:length(area.terms)){
-    print(paste0("Query: ", l, ";  Area: ", j))
-    cat("\n")
-    print(paste0("Dataset size without conversations: ", 
-                 nrow(both.tweets.and.retweets[[l]][[j]]), ", ", 
-                 length(unique(both.tweets.and.retweets[[l]][[j]]$id))))
-    
-    # If there were no conversations added, then just keep as is and move onto the next.
-    ## If a character (hence the case of "None", an empty dataset)
-    if (is.character(df[[l]][[j]])){
-      print(paste0("Conversation size: ", 0, ",", 0))
-      full.df[[l]][[j]] <- both.tweets.and.retweets[[l]][[j]];
-      print(paste0("Dataset size with conversations:", 
-                   nrow(full.df[[l]][[j]]), ", ", 
-                   length(unique(full.df[[l]][[j]]$id))))
-      next;
-    }
-    
-    print(paste0("Conversation size: ", 
-                 nrow(df[[l]][[j]]), ", ", 
-                 length(unique(df[[l]][[j]]$id))))
-    
-    full.df[[l]][[j]] <- both.tweets.and.retweets[[l]][[j]] %>% full_join(df[[l]][[j]],
-                                                                          by=intersect(colnames(both.tweets.and.retweets[[l]][[j]]),
-                                                                                       colnames(df[[l]][[j]])))
-    
-    ## Getting rid of potential duplicates as a result of joining
-    #   Duplicates arise due to potential: edit history, changes in follower numbers, account tweet counts, tweet engagement metrics, etc
-    # https://twittercommunity.com/t/edit-history-tweet-ids-field-not-edit-history-tweet-ids/182820
-    
-    ind.dup <- which(duplicated(full.df[[l]][[j]]$id))
-    if (length(ind.dup) > 0){
-      # Checking the duplicates (if need be)
-      # View(full.df[[l]][[j]][ full.df[[l]][[j]]$id %in% full.df[[l]][[j]]$id[ind.dup[1]], ])
-      full.df[[l]][[j]] <- full.df[[l]][[j]][-which(duplicated(full.df[[l]][[j]]$id)), ]
-    } 
+  # If there were no conversations added, then just keep as is and move onto the next.
+  ## If a character (hence the case of "None", an empty dataset)
+  if (is.character(df[[l]][[j]])){
+    print(paste0("Conversation size: ", 0, ",", 0))
+    full.df[[l]][[j]] <- both.tweets.and.retweets[[l]][[j]];
     print(paste0("Dataset size with conversations:", 
                  nrow(full.df[[l]][[j]]), ", ", 
                  length(unique(full.df[[l]][[j]]$id))))
+    next;
   }
   
+  print(paste0("Conversation size: ", 
+               nrow(df[[l]][[j]]), ", ", 
+               length(unique(df[[l]][[j]]$id))))
+  
+  
+  ####
+  # Adding an INDICATOR of the fact that a tweet got included SOLELY BECAUSE IT WAS A RESPONSE TO A RELEVANT THREAD,
+  # but NOT BECAUSE IT CONTAINED THE TERMS OF INTEREST.
+  # It became an issue with certain SPAM COMMENTS to GOVERNOR TWEETS
+  ####
+  
+  both.tweets.and.retweets[[l]][[j]]$reply.to.thread.no.term <- FALSE
+  df[[l]][[j]]$reply.to.thread.no.term <- TRUE
+  
+  # Disposing of duplicates ahead of time:
+  df[[l]][[j]] <- df[[l]][[j]][!(df[[l]][[j]]$id %in% unique(both.tweets.and.retweets[[l]][[j]]$id)), ]
+  
+  full.df[[l]][[j]] <- both.tweets.and.retweets[[l]][[j]] %>% full_join(df[[l]][[j]],
+                                                                       by=intersect(colnames(both.tweets.and.retweets[[l]][[j]]),
+                                                                                     colnames(df[[l]][[j]])))
+  
+  ## Getting rid of potential duplicates as a result of joining
+  #   Duplicates arise due to potential: edit history, changes in follower numbers, account tweet counts, tweet engagement metrics, etc
+  # https://twittercommunity.com/t/edit-history-tweet-ids-field-not-edit-history-tweet-ids/182820
+  
+  ind.dup <- which(duplicated(full.df[[l]][[j]]$id))
+  if (length(ind.dup) > 0){
+    # Checking the duplicates (if need be)
+    # View(full.df[[l]][[j]][ full.df[[l]][[j]]$id %in% full.df[[l]][[j]]$id[ind.dup[1]], ])
+    full.df[[l]][[j]] <- full.df[[l]][[j]][-which(duplicated(full.df[[l]][[j]]$id)), ]
+  } 
+  print(paste0("Dataset size with conversations:", 
+               nrow(full.df[[l]][[j]]), ", ", 
+               length(unique(full.df[[l]][[j]]$id))))
+}
+
 }
 
 for (l in 1:length(main.queries)){
@@ -282,13 +295,13 @@ save(full.df, file="topic.dfs.full.UNsorted.RData")
 
 
 for (l in 1:length(main.queries)){
-  for (j in 1:length(area.terms)){
-    ## 
-    print(all_equal(full.df[[l]][[j]] %>% mutate(created_at.x = as.POSIXct(created_at.x, tz = "UTC", "%Y-%m-%dT%H:%M:%OS")),
-                    full.df[[l]][[j]] %>% mutate(created_at.x = as.POSIXct(created_at.x, tz = "UTC", "%Y-%m-%dT%H:%M:%OS")) %>% arrange(created_at.x)))
-    
-    full.df[[l]][[j]] <- full.df[[l]][[j]] %>% mutate(created_at.x = as.POSIXct(created_at.x, tz = "UTC", "%Y-%m-%dT%H:%M:%OS")) %>% arrange(created_at.x)
-  }
+for (j in 1:length(area.terms)){
+  ## 
+  print(all_equal(full.df[[l]][[j]] %>% mutate(created_at.x = as.POSIXct(created_at.x, tz = "UTC", "%Y-%m-%dT%H:%M:%OS")),
+                  full.df[[l]][[j]] %>% mutate(created_at.x = as.POSIXct(created_at.x, tz = "UTC", "%Y-%m-%dT%H:%M:%OS")) %>% arrange(created_at.x)))
+  
+  full.df[[l]][[j]] <- full.df[[l]][[j]] %>% mutate(created_at.x = as.POSIXct(created_at.x, tz = "UTC", "%Y-%m-%dT%H:%M:%OS")) %>% arrange(created_at.x)
+}
 }
 
 
