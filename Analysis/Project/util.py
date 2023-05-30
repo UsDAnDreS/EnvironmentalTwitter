@@ -6,6 +6,7 @@ import re
 from nltk.corpus import stopwords
 import collections
 from Locations import Locations
+import csv
 
 
 class Util:
@@ -13,7 +14,6 @@ class Util:
     non_geo_hashtags_dict = collections.defaultdict(int)
     pure_locations = Locations().get_pure_locations("combined")
     categorized_locations = Locations().category_adder("combined")
-    relevant_terms_dict = {}
 
     def get_file_dataframe(self, url):
         """
@@ -21,84 +21,76 @@ class Util:
         :return: a dataframe of the downloaded csv file
         """
         download = requests.get(url).content
-        file_as_dataFrame = pd.read_csv(io.StringIO(download.decode('utf-8')))
+        file_as_dataFrame = pd.read_csv(io.StringIO(download.decode('utf-8')), low_memory=False)
         return file_as_dataFrame
 
-    def combine_hashtag_words(self, lst):
-        """
-        Takes in a list of tokens, and will combine tokens that are consecutive with the first one being a hashtag
-        :param lst: an array of tokens
-        :return: an array of tokens of lesser size since some are combined
-        """
-        combined_list = []
-        i = 0
-        while i < len(lst):
-            if lst[i] == "#" and i + 1 < len(lst) and not lst[i + 1].startswith("#"):
-                combined_list.append("#" + lst[i + 1].lower())
-                i += 2
-            else:
-                combined_list.append(lst[i])
-                i += 1
-        return combined_list
+    def extract_hashtags(self, sentence):
+        result = []
+        for word in sentence:
+            if word[0] == '#' and word not in result:
+                result.append(word)
+        return result
 
-    def geo_tag_harvester(self, tokenized_sentnece):
+    def geo_tag_harvester(self, list_of_hashtags):
         """
         This was made to look through a sentence at a time
-        :param tokenized_sentnece: an array of tokens
+        :param list_of_hashtags: an array of hashatags
         :return: None, it's a counter for location hashtags
         """
         pure_set = set(self.pure_locations[0])
         padded_set = set(self.categorized_locations[0])
 
-        for word in tokenized_sentnece:
-            if '#' in word:
-                hashtag = word
-                pure_word = re.sub(r"#", "", hashtag)
+        for word in list_of_hashtags:
+            caught = False
 
-                if pure_word in pure_set or pure_word in padded_set:
+            for word2 in pure_set:
+                if word in word2.lower() or word2.lower() in word:
+                    self.geo_tag_dict[word] += 1
+                    caught = True
+                    break  # Break the loop once caught
 
-                    self.geo_tag_dict[hashtag] += 1
-                else:
-                    self.non_geo_hashtags_dict[hashtag] = self.non_geo_hashtags_dict[hashtag] + 1
+            if not caught:
+                for word2 in padded_set:
+                    if word in word2.lower():
+                        self.geo_tag_dict[word] += 1
+                        caught = True
+                        break  # Break the loop once caught
 
-    def relevant_terms_catcher(self, tokenized_sentence):
-        relevant_terms = ["dead", "dead fish", "dead dolphins", "dead manatees", "smell", "irritation", "respiratory",
-                          "skin", "eye", "throat", "breathing", "asthma", "cough", "beach", "swim/swimming", "seafood",
-                          "shellfish", "health", "business/restaurant", "discolored", "color"]
-        for word in tokenized_sentence:
-            if word in relevant_terms:
-                try:
-                    self.relevant_terms_dict[word] = self.relevant_terms_dict[word] + 1
-                except:
-                    self.relevant_terms_dict[word] = 1
+            if not caught:
+                self.non_geo_hashtags_dict[word] += 1
 
-    def filter_stopwords(self, tokenized_text_column):
+    def filter_hashtags(self, tokenized_sentence):
         """
         Function to filter all the stop words and the words that we deem unnecessary/misleading the statistics
-        :param tokenized_text_column: a tokenized and partially cleaned text_column from the previous function
+        :param tokenized_sentence: a tokenized and partially cleaned text_column from the previous function
         :return: filtered lists of words that should capture the essence of what each row was about
         """
-        stop_words = set(stopwords.words('english'))
-        filtered_sentences = []
-        for sentence in tokenized_text_column:
-            filtered_sentence = [w.lower() for w in sentence if not w in stop_words]
-            filtered_sentence = [w.lower() for w in filtered_sentence if not w in Locations().get_stop_words()]
-            filtered_sentences.append(filtered_sentence)
+        result = []
+        for w in tokenized_sentence:
+            hashtag = w
+            pure_word = re.sub(r"#", "", hashtag).lower()
+            approved = True
+            for word in Locations().get_stop_words(True):
+                if word.lower() in pure_word:
+                    approved = False
+            if approved:
+                result.append(pure_word.lower())
 
-        return filtered_sentences
+        return result
 
     def tweet_popularity_weight(self, file, retweets_weight, replies_weight, likes_weight, quotes_weight,
                                 impressions_weight):
         """
         Here I will assign a weight to all the popularity metrics and then compute the average of them, this will
         allow us to rank the tweets
-        :param file: The link to the specific CSV File
-        :param retweets_weight: User will choose how important retweets are to the overall score
-        :param quotes_weight: User will choose how important quotes are to the overall score
-        :param likes_weight: User will choose how important likes are to the overall score
-        :param replies_weight: User will choose how important replies are to the overall score
-        :return: a dataframe containing the tweet ID and the popularity weight and the location of the tweet
-                 sorted by popularity
+        :param file:               The link to the specific CSV File
+        :param retweets_weight:    User will choose how important retweets are to the overall score
+        :param quotes_weight:      User will choose how important quotes are to the overall score
+        :param likes_weight:       User will choose how important likes are to the overall score
+        :param replies_weight:     user will choose how important replies are to the overall score
+        :param impressions_weight: user will choose how important impressions are
+        :return:                   a dataframe containing the tweet ID and the popularity weight and the location of
+                                   the tweets sorted by popularity
         """
         df = Util().get_file_dataframe(file)
 
@@ -108,20 +100,26 @@ class Util:
         quotes = "public_metrics.x_quote_count"
         impressions = "public_metrics.x_impression_count"
         location = "location"
+        text = "text"
+        date = 'created_at.x'
 
         rows_length = len(df['id'])
         popularity_df = pd.DataFrame(df['id'])
         popularity_df[["popularity_weight"]] = np.random.randint(1, size=(rows_length, 1))
-        popularity_df[["county"]] = np.nan
+        popularity_df[["location"]] = np.nan
+        popularity_df[["text"]] = np.nan
+        popularity_df[["date"]] = np.nan
 
-        result = [(row[0], row[1], row[2], row[3], row[4], row[5]) for row in
-                  df[[retweets, replies, likes, quotes, impressions, location]].to_numpy()]
+        result = [(row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7]) for row in
+                  df[[retweets, replies, likes, quotes, impressions, location, text, date]].to_numpy()]
 
         for index, row in enumerate(result):
             total_weighted_metric = row[0] * retweets_weight + row[1] * replies_weight + row[2] * likes_weight + row[
                 3] * quotes_weight + row[4] * impressions_weight
             popularity_df.iloc[index, 1] = total_weighted_metric
             popularity_df.iloc[index, 2] = row[5]
+            popularity_df.iloc[index, 3] = row[6]
+            popularity_df.iloc[index, 4] = row[7]
 
         # popularity_df = popularity_df.sort_values(by='popularity_weight', ascending=0)
         return popularity_df
@@ -129,9 +127,41 @@ class Util:
     def top_n_tweets_per_county(self, n, df):
         # Here it only shows the ID, which we can use to get the actual tweet text
         # We can easily add the text body if that's what we want to do
-        top3 = df.groupby('county').apply(lambda x: x.nlargest(n, 'popularity_weight')).reset_index(drop=True)
-        top3 = top3.sort_values(by='popularity_weight', ascending=0)
-        print(top3)
+        topN = df.groupby('location').apply(lambda x: x.nlargest(n, 'popularity_weight')).reset_index(drop=True)
+        topN = topN.sort_values(by='popularity_weight', ascending=0)[:n]
+        print(topN)
+        return topN
 
+    def frequency_csv_creator(self, dictionary, file_path):
+        csv_path = file_path + ".csv"
 
+        data = [{"word": key, "frequency": value} for key, value in dictionary.items()]
+        header = data[0].keys()
 
+        with open(csv_path, 'w', newline='') as file:
+            writer = csv.DictWriter(file, fieldnames=header)
+            writer.writeheader()
+            writer.writerows(data)
+
+        print("Frequency CSV file has been created successfully.")
+
+    def tweets_csv_creator(self, df, file_path):
+        """
+        THIS SHOULD BE THE LAST THING YOU CALL FOR EVERY FILE
+        :param df: dataframe containing top n tweets and their weights
+        :param file_path: the file path to which we're saving the data
+        :return: none.
+        """
+        csv_path = file_path + "top3Tweets.csv"
+        df.to_csv(csv_path, index=False)
+
+        print("Tweets CSV file has been created successfully.")
+
+        print("Clearing cache: ")
+        self.geo_tag_dict.clear()
+        self.non_geo_hashtags_dict.clear()
+        print("geo_Tag_dict:", self.geo_tag_dict)
+        print("non_geo_Tag_dict:", self.non_geo_hashtags_dict)
+
+        print("Dictionaries successfully reset.")
+        print("-----------------------------------------------------------------")

@@ -1,6 +1,6 @@
 class Locations:
 
-    def get_pure_locations(self, format):
+    def get_pure_locations(self, output_format):
         # Source: https://en.wikipedia.org/wiki/Category:Beaches_of_Florida
         beaches = ['Alligator Point', 'Amelia City', 'Amelia Island', 'American Beach', "Anna Maria Island",
                    'Anna Maria', "Anne's Beach", 'Atlantic Beach', 'Bahia Honda Key', 'Bal Harbour', 'Ballast Key',
@@ -44,99 +44,64 @@ class Locations:
                    "Vilano Beach", "Virginia Key", "Wabasso Beach", "Wilbur-By-The-Sea", "Woman Key",
                    "Fort Zachary Taylor Historic State Park"]
 
-        # Source https://www.stateofflorida.com/cities/
-        cities1 = ["Alachua", "Altamonte Springs", "Anna Maria", "Apalachicola", "Apopka", "Atlantic Beach",
-                   "Auburndale", "Aventura", "Avon Park", "Bal Harbour", "Bartow", "Bay Harbor Islands", "Boca Raton",
-                   "Bonita Springs", "Boynton Beach", "Bradenton", "Brooksville", "Cape Canaveral", "Cape Coral",
-                   "Casselberry", "Celebration", "Chipley", "Cinco Bayou", "Clearwater", "Clermont", "Clewiston",
-                   "Cocoa", "Cocoa Beach", "Coconut Creek", "Coral Gables", "Coral Springs", "Crystal River",
-                   "Dania Beach", "Davie", "Daytona Beach", "Deerfield Beach", "DeFuniak Springs", "DeLand",
-                   "Delray Beach", "Deltona", "Destin", "Dunedin", "Eagle Lake", "Edgewater", "Edgewood", "Eustis",
-                   "Fort Lauderdale", "Fort Meade", "Fort Myers", "Fort Myers Beach", "Fort Pierce",
-                   "Fort Walton Beach", "Fruitland Park", "Gainesville", "Greenacres", "Green Cove Springs",
-                   "Gulf Breeze", "Gulfport", "Haines City", "Hallandale Beach", "Hawthorne", "Hialeah",
-                   "Hialeah Gardens", "Highland Beach", "Hollywood", "Holly Hill", "Holmes Beach", "Homestead",
-                   "Hypoluxo", "Indialantic", "Jacksonville", "Juno Beach", "Jupiter", "Key Biscayne", "Key West",
-                   "Kissimmee", "LaBelle", "Lady Lake", "Lake Alfred", "Lakeland", "Lake Mary", "Lake Park",
-                   "Lake Wales", "Lake Worth", "Lantana", "Largo", "Lauderdale By The Sea", "Lauderhill", "Leesburg",
-                   "Lighthouse Point", "Longboat Key", "Longwood", "Maitland", "Marco Island", "Margate", "Melbourne",
-                   "Melbourne Beach", "Miami", "Miami Beach", "Milton", "Minneola", "Miramar", "Mount Dora", "Naples",
-                   "Neptune Beach", "New Port Richey", "New Smyrna Beach", "Niceville", "North Miami",
-                   "North Miami Beach", "North Port", "Oakland Park", "Ocala", "Ocean Ridge", "Ocoee", "Okeechobee",
-                   "Oldsmar", "Orange Park", "Orlando", "Ormond Beach", "Oviedo", "Palatka", "Palm Bay", "Palm Beach",
-                   "Palm Beach Gardens", "Palm Coast", "Palmetto", "Panama City", "Panama City Beach", "Pembroke Pines",
-                   "Pensacola", "Pinecrest", "Pinellas Park", "Plant City", "Plantation", "Pompano Beach",
-                   "Ponce Inlet", "Port Orange", "Port St. Lucie", "Punta Gorda", "Rockledge", "Royal Palm Beach",
-                   "St. Augustine", "St. Augustine Beach", "St. Cloud", "St. Pete Beach", "St. Petersburg",
-                   "Safety Harbor", "Sanford", "Sanibel", "Sarasota", 'Satellite Beach', 'Seaside', 'Sebastian',
-                   "Sewall's Point", 'Shalimar', 'Stuart', 'Surfside', 'Tallahassee', 'Tamarac', 'Tampa',
-                   'Tarpon Springs', 'Tavares', 'Temple Terrace', 'Titusville', 'Treasure Island', 'Valparaiso',
-                   'Venice', 'Vero Beach', 'Wellington', 'West Melbourne', 'West Palm Beach', 'Weston', 'Wilton Manors',
-                   'Winter Garden', 'Winter Haven', 'Winter Park', 'Winter Springs']
-
         # Source: https://www.florida-demographics.com/cities_by_population
-        # I stopped at 400
+        # Cutoff was at 10 thousand residents
         # TODO: CONVERT THE MERGED LIST TO A SET
-        cities2 = ['Jacksonville', 'Miami', 'Tampa', 'Orlando', 'St. Petersburg', 'Hialeah', 'Port St. Lucie',
-                   'Tallahassee', 'Cape Coral', 'Fort Lauderdale', 'Pembroke Pines', 'Hollywood', 'Gainesville',
-                   'Miramar', 'Coral Springs', 'Lehigh Acres', 'Palm Bay', 'Clearwater', 'West Palm Beach', 'Brandon',
-                   'Spring Hill', 'Miami Gardens', 'Pompano Beach', 'Lakeland', 'Davie', 'Riverview', 'Sunrise',
-                   'Boca Raton', 'Deltona', 'Plantation city', 'Alafaya', 'Town Country', 'Palm Coast',
-                   'Deerfield Beach', 'Fort Myers', 'Pine Hills', 'Melbourne', 'Miami Beach', 'Largo', 'Boynton Beach',
-                   'Homestead', 'Kendall', 'Kissimmee', 'The Villages', 'North Port', 'Lauderhill', 'Doral', 'Tamarac',
-                   'Daytona Beach', 'Poinciana', 'Weston', 'Delray Beach', 'Wesley Chapel', 'Port Charlotte', 'Ocala',
-                   'Port Orange', 'The Hammocks', 'Wellington', 'Palm Harbor', 'Jupiter', 'North Miami', 'Sanford',
-                   'Palm Beach Gardens', 'Margate', 'Fountainebleau', 'St. Cloud', 'Coconut Creek', 'Bradenton',
-                   'Tamiami', 'Westchester', 'Apopka', 'Horizon West', 'Pensacola', 'Sarasota', 'Kendale Lakes',
-                   'Pinellas Park', 'Bonita Springs', 'Country Club', 'Four Corners', 'Coral Gables', 'Winter Haven',
-                   'University CDP', 'Titusville', 'Ocoee', 'Fort Pierce', 'Winter Garden', 'Altamonte Springs',
-                   'Cutler Bay', 'North Lauderdale', 'Oakland Park', 'Greenacres', 'North Miami Beach', 'Ormond Beach',
-                   'Lake Worth Beach', 'Clermont', 'North Fort Myers', 'Hallandale Beach', 'The Acreage',
-                   'Meadow Woods', 'Aventura', 'Valrico', 'Oviedo', 'Plant City', 'Navarre', 'Royal Palm Beach',
-                   "Land O' Lakes", 'Winter Springs', 'Richmond West', 'University CDP', 'Riviera Beach',
-                   'Kendall West', 'DeLand', 'Princeton', 'South Miami Heights', 'Estero', 'Egypt Lake-Leto', 'Dunedin',
-                   'Buenaventura Lakes', 'Lauderdale Lakes', 'Carrollwood', 'Panama City', 'Fruit Cove',
-                   'Merritt Island', 'Golden Glades', 'Cooper City', 'Parkland', 'West Little River', 'East Lake',
-                   'Dania Beach', 'Lake Magdalene', 'Lakeside', 'Miami Lakes', 'Ferry Pass', 'East Lake-Orient Park',
-                   'New Smyrna Beach', 'Winter Park', 'Vero Beach South', 'Fleming Island', 'Lakewood Ranch',
-                   'Golden Gate', 'Oakleaf Plantation', 'Casselberry', 'Immokalee', 'Rockledge', 'Citrus Park',
-                   'Crestview', 'Sun City Center', 'Key West', 'Leisure City', 'Palm Springs', "Temple Terrace",
-                   "Ruskin", "Haines City", "Leesburg", "Oak Ridge", "Coral Terrace", "West Melbourne", "Ives Estates",
-                   "Palm River-Clair Mel", "Palm City", "Keystone", "Silver Springs Shores", "Bayonet Point",
-                   "Tarpon Springs", "Bloomingdale", "South Bradenton", "Northdale", "Venice", "Sebastian", "Wright",
-                   "Apollo Beach", "Port St. John", "Fish Hawk", "Palmetto Bay", "Westchase", "Wekiwa Springs", "Lutz",
-                   "Pace", "Jacksonville Beach", "Jasmine Estates", "Edgewater", "Hialeah Gardens", "Bellview",
-                   "Eustis", "The Crossings", "Sunny Isles Beach", "Florida Ridge", "Ensley", "DeBary",
-                   "West Pensacola", "Brent", "Holiday", "Liberty Triangle", "Lealman", "Fort Walton Beach",
-                   "Marion Oaks", "Palm Valley", "World Golf Village", "Bayshore Gardens", "Englewood", "Midway CDP",
-                   "Nocatee", "Hunters Creek", "Sweetwater", "Lynn Haven", "Punta Gorda", "Seminole", "Naples",
-                   "Maitland", "Cocoa", "Bartow", "Bradfordville", "Country Walk", "San Carlos Park", "Pinecrest",
-                   "Tavares", "Gibsonton", "Trinity", "Upper Grand Lagoon", "Groveland", "Panama City Beach",
-                   "Brownsville", "Lake Butler CDP", "Stuart", "Glenvar Heights", "Pinewood", "Safety Harbor",
-                   "Myrtle Grove", "Belle Glade", "Zephyrhills", "Palmetto Estates", "Ojus", "Lake Mary",
-                   "South Venice", "New Port Richey", "Opa-locka", "Vero Beach", "Lake Wales", "Warrington",
-                   "Marco Island", "Mount Dora", "Auburndale", "Lady Lake", "Southchase", "Azalea Park", "Niceville",
-                   "Three Lakes", "Longwood", "West Park", "Oldsmar", 'Wildwood', 'Homosassa Springs', 'Fruitville',
-                   'East Milton', 'Key Biscayne', 'Palmer Ranch', 'Sunset', 'Lockhart', 'Gonzalez', 'Viera West',
-                   'Bellair-Meadowbrook Terrace', 'Thonotosassa', 'Yulee', 'Gladeview', 'Forest City', 'St. Augustine',
-                   'Hobe Sound', 'Miami Springs', 'West Lealman', 'Villas', 'Destin', 'Minneola', 'Olympia Heights',
-                   'Callaway', 'Conway', 'Lakewood Park', 'Jupiter Farms', 'Atlantic Beach', 'Elfers', 'Palmetto',
-                   'Iona', 'Jensen Beach', 'North Palm Beach', 'South Daytona', 'Naranja', 'Florida City', 'Cheval',
-                   'Holly Hill', 'Orange City', 'Fernandina Beach', 'Goldenrod', 'Doctor Phillips', 'Sarasota Springs',
-                   'Shady Hills', 'Cypress Lake', 'Lake City', 'Middleburg', 'Viera East', 'South Miami', 'Gulfport',
-                   'On Top of the World', 'Pasadena Hills', 'Fairview Shores', 'Asbury Lake', 'Mango', 'Miami Shores',
-                   'Wilton Manors', 'Lantana', 'Medulla', 'Port Salerno', 'Lakeland Highlands', 'Cocoa Beach',
-                   'Celebration', 'Laurel', 'Hudson', 'Pine Castle', 'Wimauma', 'New Port Richey East',
-                   'Fuller Heights', 'Satellite Beach', 'Memphis', 'Westview', 'Highland City', 'Goulds', 'Key Largo',
-                   'Sebring', 'Gateway', 'Westwood Lakes', 'Sugarmill Woods', 'Pebble Creek', 'Lighthouse Point',
-                   'Alachua', 'Bithlo', 'Palatka', 'Union Park', 'Richmond Heights', 'Beverly Hills', 'Cypress Gardens',
-                   'Citrus Springs', 'West Vero Corridor', 'Progress Village', 'West Perrine', 'Pine Ridge CDP',
-                   'Milton', 'Cape Canaveral', 'Bee Ridge', 'Rotonda', 'St. Augustine Shores', 'Avon Park', 'Bardmoor',
-                   'Marathon', 'Hernando', 'Green Cove Springs', 'Palm Beach', 'Miramar Beach', 'Davenport', 'Westgate',
-                   'Lake Park', 'St. Pete Beach', 'Indian Harbour Beach', 'Brooksville', 'Orange Park', 'Micco',
-                   'Broadview Park', 'Seffner', 'Gulf Gate', 'North Merritt Island', 'Springfield', 'Citrus Hills',
-                   'Fern Park', 'North Bay Village']
-        cities_overall = cities1 + cities2
+        cities = ['Jacksonville', 'Miami', 'Tampa', 'Orlando', 'St. Petersburg', 'Hialeah', 'Port St. Lucie',
+                  'Tallahassee', 'Cape Coral', 'Fort Lauderdale', 'Pembroke Pines', 'Hollywood', 'Gainesville',
+                  'Miramar', 'Coral Springs', 'Lehigh Acres', 'Palm Bay', 'Clearwater', 'West Palm Beach', 'Brandon',
+                  'Spring Hill', 'Miami Gardens', 'Pompano Beach', 'Lakeland', 'Davie', 'Riverview', 'Sunrise',
+                  'Boca Raton', 'Deltona', 'Plantation city', 'Alafaya', 'Town Country', 'Palm Coast',
+                  'Deerfield Beach', 'Fort Myers', 'Pine Hills', 'Melbourne', 'Miami Beach', 'Largo', 'Boynton Beach',
+                  'Homestead', 'Kendall', 'Kissimmee', 'The Villages', 'North Port', 'Lauderhill', 'Doral', 'Tamarac',
+                  'Daytona Beach', 'Poinciana', 'Weston', 'Delray Beach', 'Wesley Chapel', 'Port Charlotte', 'Ocala',
+                  'Port Orange', 'The Hammocks', 'Wellington', 'Palm Harbor', 'Jupiter', 'North Miami', 'Sanford',
+                  'Palm Beach Gardens', 'Margate', 'Fountainebleau', 'St. Cloud', 'Coconut Creek', 'Bradenton',
+                  'Tamiami', 'Westchester', 'Apopka', 'Horizon West', 'Pensacola', 'Sarasota', 'Kendale Lakes',
+                  'Pinellas Park', 'Bonita Springs', 'Country Club', 'Four Corners', 'Coral Gables', 'Winter Haven',
+                  'University CDP', 'Titusville', 'Ocoee', 'Fort Pierce', 'Winter Garden', 'Altamonte Springs',
+                  'Cutler Bay', 'North Lauderdale', 'Oakland Park', 'Greenacres', 'North Miami Beach', 'Ormond Beach',
+                  'Lake Worth Beach', 'Clermont', 'North Fort Myers', 'Hallandale Beach', 'The Acreage',
+                  'Meadow Woods', 'Aventura', 'Valrico', 'Oviedo', 'Plant City', 'Navarre', 'Royal Palm Beach',
+                  "Land O' Lakes", 'Winter Springs', 'Richmond West', 'University CDP', 'Riviera Beach',
+                  'Kendall West', 'DeLand', 'Princeton', 'South Miami Heights', 'Estero', 'Egypt Lake-Leto', 'Dunedin',
+                  'Buenaventura Lakes', 'Lauderdale Lakes', 'Carrollwood', 'Panama City', 'Fruit Cove',
+                  'Merritt Island', 'Golden Glades', 'Cooper City', 'Parkland', 'West Little River', 'East Lake',
+                  'Dania Beach', 'Lake Magdalene', 'Lakeside', 'Miami Lakes', 'Ferry Pass', 'East Lake-Orient Park',
+                  'New Smyrna Beach', 'Winter Park', 'Vero Beach South', 'Fleming Island', 'Lakewood Ranch',
+                  'Golden Gate', 'Oakleaf Plantation', 'Casselberry', 'Immokalee', 'Rockledge', 'Citrus Park',
+                  'Crestview', 'Sun City Center', 'Key West', 'Leisure City', 'Palm Springs', "Temple Terrace",
+                  "Ruskin", "Haines City", "Leesburg", "Oak Ridge", "Coral Terrace", "West Melbourne", "Ives Estates",
+                  "Palm River-Clair Mel", "Palm City", "Keystone", "Silver Springs Shores", "Bayonet Point",
+                  "Tarpon Springs", "Bloomingdale", "South Bradenton", "Northdale", "Venice", "Sebastian", "Wright",
+                  "Apollo Beach", "Port St. John", "Fish Hawk", "Palmetto Bay", "Westchase", "Wekiwa Springs", "Lutz",
+                  "Pace", "Jacksonville Beach", "Jasmine Estates", "Edgewater", "Hialeah Gardens", "Bellview",
+                  "Eustis", "The Crossings", "Sunny Isles Beach", "Florida Ridge", "Ensley", "DeBary",
+                  "West Pensacola", "Brent", "Holiday", "Liberty Triangle", "Lealman", "Fort Walton Beach",
+                  "Marion Oaks", "Palm Valley", "World Golf Village", "Bayshore Gardens", "Englewood", "Midway CDP",
+                  "Nocatee", "Hunters Creek", "Sweetwater", "Lynn Haven", "Punta Gorda", "Seminole", "Naples",
+                  "Maitland", "Cocoa", "Bartow", "Bradfordville", "Country Walk", "San Carlos Park", "Pinecrest",
+                  "Tavares", "Gibsonton", "Trinity", "Upper Grand Lagoon", "Groveland", "Panama City Beach",
+                  "Brownsville", "Lake Butler CDP", "Stuart", "Glenvar Heights", "Pinewood", "Safety Harbor",
+                  "Myrtle Grove", "Belle Glade", "Zephyrhills", "Palmetto Estates", "Ojus", "Lake Mary",
+                  "South Venice", "New Port Richey", "Opa-locka", "Vero Beach", "Lake Wales", "Warrington",
+                  "Marco Island", "Mount Dora", "Auburndale", "Lady Lake", "Southchase", "Azalea Park", "Niceville",
+                  "Three Lakes", "Longwood", "West Park", "Oldsmar", 'Wildwood', 'Homosassa Springs', 'Fruitville',
+                  'East Milton', 'Key Biscayne', 'Palmer Ranch', 'Sunset', 'Lockhart', 'Gonzalez', 'Viera West',
+                  'Bellair-Meadowbrook Terrace', 'Thonotosassa', 'Yulee', 'Gladeview', 'Forest City', 'St. Augustine',
+                  'Hobe Sound', 'Miami Springs', 'West Lealman', 'Villas', 'Destin', 'Minneola', 'Olympia Heights',
+                  'Callaway', 'Conway', 'Lakewood Park', 'Jupiter Farms', 'Atlantic Beach', 'Elfers', 'Palmetto',
+                  'Iona', 'Jensen Beach', 'North Palm Beach', 'South Daytona', 'Naranja', 'Florida City', 'Cheval',
+                  'Holly Hill', 'Orange City', 'Fernandina Beach', 'Goldenrod', 'Doctor Phillips', 'Sarasota Springs',
+                  'Shady Hills', 'Cypress Lake', 'Lake City', 'Middleburg', 'Viera East', 'South Miami', 'Gulfport',
+                  'On Top of the World', 'Pasadena Hills', 'Fairview Shores', 'Asbury Lake', 'Mango', 'Miami Shores',
+                  'Wilton Manors', 'Lantana', 'Medulla', 'Port Salerno', 'Lakeland Highlands', 'Cocoa Beach',
+                  'Celebration', 'Laurel', 'Hudson', 'Pine Castle', 'Wimauma', 'New Port Richey East',
+                  'Fuller Heights', 'Satellite Beach', 'Memphis', 'Westview', 'Highland City', 'Goulds', 'Key Largo',
+                  'Sebring', 'Gateway', 'Westwood Lakes', 'Sugarmill Woods', 'Pebble Creek', 'Lighthouse Point',
+                  'Alachua', 'Bithlo', 'Palatka', 'Union Park', 'Richmond Heights', 'Beverly Hills', 'Cypress Gardens',
+                  'Citrus Springs', 'West Vero Corridor', 'Progress Village', 'West Perrine', 'Pine Ridge CDP',
+                  'Milton', "Florida"]
 
         # Source: https://www.stateofflorida.com/florida-counties/
         counties = ['Alachua', 'Baker', 'Bay', 'Bradford', 'Brevard', 'Broward', 'Calhoun', 'Charlotte', 'Citrus',
@@ -210,11 +175,23 @@ class Locations:
                 'East Bay', 'Escambia Bay', 'Estero Bay', 'Florida Bay', 'Pensacola Bay', 'Ponce de Leon Bay',
                 'Sarasota Bay', 'St. Andrews Bay', 'St. Joseph Bay', 'Tampa Bay', 'Whitewater Bay']
 
-        combined = beaches + cities_overall + counties + lake_list + rivers + bays
-        combined = [w.lower().replace(" ", "").replace(".", "").replace("'", "") for w in combined]
-        return combined if format == "combined" else beaches, cities_overall, counties, lake_list, rivers, bays
+        # This list will have the towns/cities of every city of interest we have
+        towns = ["Anna Maria", "Bradenton", "Bradenton Beach", "Cortez", "Ellenton", "Holmes Beach", "Longboat Key",
+                 "Myakka City", "Oneco", "Palmetto", "Parrish", "Sarasota", "Tallevast", "Terra Ceia", "Apollo Beach",
+                 "Balm", "Brandon", "Dover", "Durant", "Gibsonton", "Lithia", "Lutz", "Mango", "Odessa", "Plant City",
+                 "Riverview", "Ruskin", "Seffner", "Sun City", "Sun City Center", "Sydney", "Tampa", "Thonotosassa",
+                 "Valrico", "Wimauma", "Bay Pines", "Belleair Beach", "Clearwater", "Clearwater Beach", "Crystal Beach",
+                 "Dunedin", "Indian Rocks Beach", "Largo", "Oldsmar", "Ozona", "Palm Harbor", "Pinellas Park",
+                 "Safety Harbor", "Saint Petersburg", "Seminole", "Tarpon Springs", "Aripeka", "Crystal Springs",
+                 "Dade City", "Holiday", "Hudson", "Lacoochee", "Land O Lakes", "New Port Richey", "Port Richey",
+                 "Saint Leo", "San Antonio", "Spring Hill", "Trilby", "Wesley Chapel", "Zephyrhills"]
+        other = ["fl", "florida", "swfl", "floridas"]
 
-    def category_adder(self, format):
+        combined = beaches + cities + counties + lake_list + rivers + bays + towns + other
+        combined = [w.lower().replace(" ", "").replace(".", "").replace("'", "") for w in combined]
+        return combined if output_format == "combined" else beaches, cities, counties, lake_list, rivers, bays, towns
+
+    def category_adder(self, output_format):
         """
         Adds the category to the location name
         for example if the word trout comes in the category river, it will:
@@ -223,7 +200,7 @@ class Locations:
 
         :return: A enhanced list that have the location+category
         """
-        beaches, cities, counties, lake_list, rivers, bays = self.get_pure_locations("")
+        beaches, cities, counties, lake_list, rivers, bays, towns = self.get_pure_locations("")
         suffixes_beach = ["Beach", "Key", "Island", "City"]
         suffixed_beaches = [
             beach.replace(" ", "") + "Beach" if beach.split(" ")[-1] not in suffixes_beach else beach
@@ -249,7 +226,7 @@ class Locations:
 
         combined = suffixed_beaches + suffixed_cities + suffixed_counties + prefixed_lakes
         combined = [w.lower() for w in combined]
-        return combined if format == "combined" else suffixed_beaches, suffixed_cities, suffixed_counties, prefixed_lakes
+        return combined if output_format == "combined" else suffixed_beaches, suffixed_cities, suffixed_counties, prefixed_lakes
 
     def get_non_location_query_words(self):
         stop_words_from_queries = ['raw', 'septic', 'chemicals', 'discharges', 'discharge', 'storm water', 'algae',
@@ -301,13 +278,14 @@ class Locations:
 
         return geo_marks
 
-    def get_stop_words(self):
+    def get_stop_words(self, pre):
+        # "still", "with", "her", "StillWithHer"
         non_location_sw = self.get_non_location_query_words()
         geo_marks = self.get_location_query_words()
         our_own_stop_words = ["https", "http", "video", "image", "photo", "'", "news", "html", "com", "www",
                               "storylink",
-                              "usf", "wusf", "edu", "red", "tide"]
+                              "usf", "wusf", "edu", "red", "tide", "redtide", "cameron", "camerin", "herrin",
+                              "camerinherrin","cameronherrin", "justice"]
         all_query_words = our_own_stop_words + non_location_sw + geo_marks
         all_query_words = [word.lower() for word in all_query_words]
-
-        return all_query_words
+        return our_own_stop_words if pre else all_query_words
