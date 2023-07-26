@@ -8,7 +8,8 @@ library(tidyverse)
 
 
 # Replace the bearer token below with
-bearer_token = "AAAAAAAAAAAAAAAAAAAAAIz1dwEAAAAAmC7OAMvDF4b4rWtGOrcbJIu5dbU%3DaZWJv0ZMt9oY1PcKLYjsrlvWQoq42sYe3etHPdOERaCjNepFMb"
+# bearer_token = "AAAAAAAAAAAAAAAAAAAAAIz1dwEAAAAAmC7OAMvDF4b4rWtGOrcbJIu5dbU%3DaZWJv0ZMt9oY1PcKLYjsrlvWQoq42sYe3etHPdOERaCjNepFMb"
+bearer_token = "AAAAAAAAAAAAAAAAAAAAAIz1dwEAAAAAkRetyUamtse3CLMOy2wYoDZQQ0Y%3D1nDoYSBLz2mpNjY5KaVsdITqmXXbstnRyYhFG6Nq1SR6Q9pUwC"
 
 headers = c(
   `Authorization` = sprintf('Bearer %s', bearer_token)
@@ -200,7 +201,10 @@ fix_page_data<-function(page.data){
 #' @param params A list of parameters, in format list(`query`=query.text , max_results='100',...) etc.  See set_parameters function.
 #' @param iter.limit Maximum pages to request.  Page limit is 100, so maximum return is 100*iter.limit.  '0' For no limit. Default 10.
 #'    Note: return per page is rarely 100, 92-97 is typical.  All results should still return.
-#'
+#' @param type Maximum pages to request. Do we use recent ("recent") or full archive ("all") search? 
+#' The former is available in "Basic" level but only goes 1 week back, 
+#' while the latter is available in Academ Research (might be deprecated for good) and Enterprise (super expensive) and can go much further back.
+#' 
 #' @return A dataframe with all requested tweets within parameters.
 #' @dependencies fix_page_data()
 #'
@@ -209,7 +213,7 @@ fix_page_data<-function(page.data){
 #' query_twitter(set_parameters('dogs cats','2022-09-25','2022-09-30'),iter.limit=0,safety=FALSE) #9/25-9/30, may run forever.
 #' 
 #'
-query_twitter<-function(params,iter.limit=10,safety=FALSE){
+query_twitter<-function(params,iter.limit=10,safety=FALSE, type="recent"){
   #Initialize
   next.list<-NA
   output.df<-NULL
@@ -226,7 +230,7 @@ query_twitter<-function(params,iter.limit=10,safety=FALSE){
     
     #Request Tweets
     if(safety){
-      response <- httr::GET(url = 'https://api.twitter.com/2/tweets/search/all', 
+      response <- httr::GET(url = paste0('https://api.twitter.com/2/tweets/search/', type), 
                             httr::add_headers(.headers=headers), 
                             query = params.extended)
       fas_body <-
@@ -253,7 +257,7 @@ query_twitter<-function(params,iter.limit=10,safety=FALSE){
       flag <- 0
       
       while (flag == 0){
-        try(response <- httr::GET(url = 'https://api.twitter.com/2/tweets/search/all',
+        try(response <- httr::GET(url = paste0('https://api.twitter.com/2/tweets/search/', type),
                                   httr::add_headers(.headers=headers),
                                   query = params.extended))
         fas_body <-
@@ -354,7 +358,7 @@ query_twitter_count<-function(params,iter.limit=.Machine$integer.max,granularity
       params.extended<-params
     }
     
-    response <- httr::GET(url = 'https://api.twitter.com/2/tweets/counts/all', httr::add_headers(.headers=headers), query = params.extended)
+    response <- httr::GET(url = paste0('https://api.twitter.com/2/tweets/search/', type), httr::add_headers(.headers=headers), query = params.extended)
     fas_body <-
       content(
         response,
