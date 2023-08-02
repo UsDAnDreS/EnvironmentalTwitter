@@ -139,8 +139,13 @@ fix_page_data<-function(page.data){
   # 1. Checking if it's a dataframe (other lists - keep them as is)
   # 2. Separating the columns out.
   
+  # To keep indices of "data.frame" columns
+  df.col.ind <- NULL
+  
   for(j in 1:ncol(page.data)){
     if((class(page.data[,j])=="data.frame")){
+      df.col.ind <- c(df.col.ind, j)
+      
       #print(colnames(page.data)[j])
       #print(paste(j,colnames(page.data)[j]),sep=' ')
       
@@ -156,6 +161,10 @@ fix_page_data<-function(page.data){
       }
     }
   }
+  
+  # Remove the "data frame" columns (as we already have that data as separate columns)
+  page.data[, df.col.ind] <- NULL
+  
   
   #Clean up any remaining compound list variables
   ## THOMAS' stuff: I don't think that's really needed.

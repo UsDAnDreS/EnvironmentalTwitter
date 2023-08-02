@@ -80,7 +80,7 @@ topic.dfs <- list()
 main.queries <- main.queries[c("RedTide", "AllAlgae")]
 main.queries
 
-for (l in 2:length(main.queries)){
+for (l in 1:length(main.queries)){
 
   print(paste("Query #",l, sep=""))
   print(main.queries[[l]])

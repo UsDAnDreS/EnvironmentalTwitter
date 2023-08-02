@@ -41,11 +41,17 @@ for (l in 1:length(full.df)) names(full.df[[l]]) <- names(area.terms)
 # save(all.full.dfs, file = "Data/ALL.recent.search.dfs.full.sorted.RData")
 
 # Subsequent runs
+
+## The warning is fine, it's just due to double-designation for "Posix" date/time variable
+
 load("Data/ALL.recent.search.dfs.full.sorted.RData")
 for (l in 1:length(all.full.dfs)){
   for (j in 1:length(all.full.dfs[[l]])){
-    all.full.dfs[[l]][[j]] <- rbind(full.df[[l]][[j]],
-                                    all.full.dfs[[l]][[j]])
+
+    all.full.dfs[[l]][[j]] <- bind_rows(fix_page_data(full.df[[l]][[j]]),
+                                        fix_page_data(all.full.dfs[[l]][[j]]))
+    
+    
     if (nrow(all.full.dfs[[l]][[j]]) != 0){
       all.full.dfs[[l]][[j]] <- all.full.dfs[[l]][[j]][!duplicated(all.full.dfs[[l]][[j]]$id), ]
       all.full.dfs[[l]][[j]] <- all.full.dfs[[l]][[j]] %>% arrange(desc(created_at.x))
