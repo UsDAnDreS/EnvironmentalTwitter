@@ -1,12 +1,15 @@
 ######
+## Appending the most recent data to the already-existing historical database, saving it to R object
+##  "Data/ALL.recent.search.dfs.full.sorted.RData", which is
+##    - A LIST of LISTS
+##    - First layer corresponds to the 2 ENVIRONMENTAL ISSUES, hence 2 elements (titled "RedTide", "Algae")
+##    - Second layer corresponds to the 6 LOCATIONS, hence 6 elements (titled "Tampa", "Pinellas.Clearwater", etc)
+##
+##
 ## Creating .csv data set files
 ##    Simply disposing of the "list"/"data.frame" style variables (retaining only SIMPLE columns),
-##    while still keeping those around in the R object ("topics.df.full.sorted.RData")
+##    (while still keeping those around in the aforementioned R object)
 ##
-## The "topics.df" object structure is:
-##    - It's a LIST of LISTS
-##    - First layer corresponds to the 5 ENVIRONMENTAL ISSUES, hence 5 elements (titled "RedTide", "BlueGreen", etc)
-##    - Second layer corresponds to the 6 LOCATIONS, hence 6 elements (titled "Tampa", "Pinellas.Clearwater", etc)
 ######
 
 source("Project_Functions.R")
@@ -45,11 +48,18 @@ for (l in 1:length(full.df)) names(full.df[[l]]) <- names(area.terms)
 ## The warning is fine, it's just due to double-designation for "Posix" date/time variable
 
 load("Data/ALL.recent.search.dfs.full.sorted.RData")
-for (l in 1:length(all.full.dfs)){
-  for (j in 1:length(all.full.dfs[[l]])){
+for (l in 2:length(all.full.dfs)){
+  for (j in 4:length(all.full.dfs[[l]])){
 
-    all.full.dfs[[l]][[j]] <- bind_rows(fix_page_data(full.df[[l]][[j]]),
-                                        fix_page_data(all.full.dfs[[l]][[j]]))
+    if (nrow(all.full.dfs[[l]][[j]]) != 0){
+      if (nrow(full.df[[l]][[j]]) != 0){
+      all.full.dfs[[l]][[j]] <- bind_rows(fix_page_data(full.df[[l]][[j]]),
+                                          fix_page_data(all.full.dfs[[l]][[j]]))
+      } 
+    } else {
+      all.full.dfs[[l]][[j]] <- fix_page_data(full.df[[l]][[j]])
+    }
+
     
     
     if (nrow(all.full.dfs[[l]][[j]]) != 0){
@@ -58,6 +68,12 @@ for (l in 1:length(all.full.dfs)){
     }
   }
 }
+
+lapply(full.df[[1]], dim)
+lapply(full.df[[2]], dim)
+
+lapply(all.full.dfs[[1]], dim)
+lapply(all.full.dfs[[2]], dim)
 
 save(all.full.dfs, file = "Data/ALL.recent.search.dfs.full.sorted.RData")
 
