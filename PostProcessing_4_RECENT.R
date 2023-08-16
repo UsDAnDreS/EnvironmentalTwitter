@@ -48,8 +48,8 @@ for (l in 1:length(full.df)) names(full.df[[l]]) <- names(area.terms)
 ## The warning is fine, it's just due to double-designation for "Posix" date/time variable
 
 load("Data/ALL.recent.search.dfs.full.sorted.RData")
-for (l in 2:length(all.full.dfs)){
-  for (j in 4:length(all.full.dfs[[l]])){
+for (l in 1:length(all.full.dfs)){
+  for (j in 1:length(all.full.dfs[[l]])){
 
     if (nrow(all.full.dfs[[l]][[j]]) != 0){
       if (nrow(full.df[[l]][[j]]) != 0){
@@ -74,6 +74,8 @@ lapply(full.df[[2]], dim)
 
 lapply(all.full.dfs[[1]], dim)
 lapply(all.full.dfs[[2]], dim)
+
+# View(all.full.dfs[[1]][[1]])
 
 save(all.full.dfs, file = "Data/ALL.recent.search.dfs.full.sorted.RData")
 
