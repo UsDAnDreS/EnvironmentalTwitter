@@ -20,7 +20,7 @@ tag_map['R'] = wn.ADV
 tag_map['AS'] = wn.ADJ_SAT
 
 # filepath = "finalized_8K_accounts.csv"
-filepath = "finalized_8K_accounts_emojis_replaced.csv"
+filepath = "./data/finalized_8K_accounts_emojis_replaced.csv"
 hand_label = "hand.label"
 government = "gov"
 academia = "acad"
