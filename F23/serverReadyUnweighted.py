@@ -147,8 +147,8 @@ for n_gram_range in n_gram_ranges:
     print()
     """
 
-    result["tfidf_unweighted_unenhanced" + n_gram_range] = metrics.classification_report(y_test, tfidf_y_pred_test)
-    result["BOW_unweighted_unenhanced" + n_gram_range] = metrics.classification_report(y_test, bag_of_words_y_pred_test)
+    result["tfidf_unweighted_unenhanced" + str(n_gram_range)] = metrics.classification_report(y_test, tfidf_y_pred_test)
+    result["BOW_unweighted_unenhanced" + str(n_gram_range)] = metrics.classification_report(y_test, bag_of_words_y_pred_test)
 
 print(result)
 
