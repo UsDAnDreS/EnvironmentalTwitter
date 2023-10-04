@@ -12,6 +12,7 @@ from nltk.stem.wordnet import WordNetLemmatizer
 from nltk import word_tokenize, pos_tag
 from collections import defaultdict
 import re
+import json
 
 tag_map = defaultdict(lambda: wn.NOUN)
 tag_map['J'] = wn.ADJ
@@ -51,7 +52,7 @@ def preprocessing(row):
 df['description_lemmatized'] = df['description'].apply(preprocessing)
 
 # Enhanced data
-filepath = "finalized_BIASED_accounts_ONLY_NON_OTHER.csv"
+filepath = "./data/finalized_BIASED_accounts_ONLY_NON_OTHER_emojis_replaced.csv"
 
 df2 = pd.read_csv(filepath)
 df2 = df2[((df2[hand_label] == 'media') | (df2[hand_label] == academia) | (df2[hand_label] == government) | (
@@ -153,7 +154,6 @@ for n_gram_range in n_gram_ranges:
 
 print(result)
 
-import json
 
 def save_dict_to_file(dictionary, filename):
     with open(filename, 'w') as file:
