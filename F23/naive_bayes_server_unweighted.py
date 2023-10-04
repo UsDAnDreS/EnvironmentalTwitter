@@ -57,6 +57,8 @@ def preprocessing(row):
     return str(lemma)
 
 
+df['description_lemmatized'] = df['description'].apply(preprocessing)
+
 # split my data into training, and test sets
 scaler = StandardScaler()
 

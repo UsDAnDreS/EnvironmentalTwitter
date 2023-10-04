@@ -15,7 +15,6 @@ import json
 
 # Initialization
 count_vectorizer = CountVectorizer(stop_words="english", ngram_range=(1, 1))
-tfidf_transformer = TfidfTransformer()
 nb_clf = MultinomialNB()
 lemmatizer = WordNetLemmatizer()
 
@@ -55,6 +54,7 @@ def preprocessing(row):
     return str(lemma)
 
 
+df['description_lemmatized'] = df['description'].apply(preprocessing)
 # split my data into training, and test sets
 scaler = StandardScaler()
 
