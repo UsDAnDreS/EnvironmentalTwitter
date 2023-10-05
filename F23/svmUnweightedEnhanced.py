@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 from sklearn.model_selection import cross_val_predict, train_test_split, GridSearchCV
 from sklearn.svm import SVC
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
@@ -109,8 +110,9 @@ for n_gram_range in n_gram_ranges:
     bag_of_words_y_pred_test = bag_of_words_pipeline.predict(X_test)
 
     cm_count = confusion_matrix(y_train, y_pred_bag_of_words_cross_validation, normalize='true')
+    np.savetxt("SVM_BOW_unweighted_enhanced_cross_validation_confusion_matrix" + str(n_gram_range) + '.txt', cm_count,
+               delimiter=',', fmt='%f')
 
-    result["SVM_BOW_unweighted_enhanced_cross_validation_confusion_matrix" + str(n_gram_range)] = cm_count
     result["SVM_BOW_unweighted_enhanced_predictions_testSet" + str(n_gram_range)] = metrics.classification_report(y_test,
                                                                                                                 bag_of_words_y_pred_test)
 
