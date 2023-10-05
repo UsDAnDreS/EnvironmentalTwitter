@@ -79,30 +79,29 @@ X_train, X_test, y_train, y_test = train_test_split(X, y_labels, test_size=0.2, 
 
 tfidf_transformer = TfidfTransformer()
 
-n_gram_ranges = [(1,1), (1,2), (2,2)]
+n_gram_ranges = [(1,1)]
 
 result = {}
 for n_gram_range in n_gram_ranges:
     count_vectorizer = CountVectorizer(stop_words="english", ngram_range=n_gram_range)
 
+    """ 
     tfidf_pipeline = Pipeline([
         ('vectorizer', count_vectorizer),
         ('transformer', tfidf_transformer),
         ('normalize', StandardScaler(with_mean=False)),
         ('classifier', SVC())
     ])
-
+    
     tfidf_param_grid = [
         {
             ''
-            'vectorizer__min_df': [0.0],
+            'vectorizer__min_df': [1,2,5],
             'transformer__use_idf': [True],
             'classifier__C': [1.0e-10, 0.5, 3.0, 10.0],
             'classifier__kernel': ['linear', 'poly', 'rbf', 'sigmoid'],
             # 'classifier__class_weight': ["balanced"]
-        }
-    ]
-
+        }] """
     bag_of_words_pipeline = Pipeline([
         ('vectorizer', count_vectorizer),
         ('normalize', StandardScaler(with_mean=False)),
@@ -111,43 +110,42 @@ for n_gram_range in n_gram_ranges:
 
     bag_of_words_param_grid = [
         {
-            'vectorizer__min_df': [0.0],
+            'vectorizer__min_df': [1,2,5],
             'classifier__C': [1.0e-10, 0.5, 3.0, 10.0],
             'classifier__kernel': ['linear', 'poly', 'rbf', 'sigmoid'],
             # 'classifier__class_weight': ["balanced"]
         }
     ]
 
-    tfidf_grid_search = GridSearchCV(estimator=tfidf_pipeline, param_grid=tfidf_param_grid, cv=5, scoring='accuracy',
-                                     verbose=1, error_score="raise")
-    tfidf_grid_search.fit(X_train, y_train)
+    # tfidf_grid_search = GridSearchCV(estimator=tfidf_pipeline, param_grid=tfidf_param_grid, cv=5, scoring='accuracy',verbose=1, error_score="raise")
+    # tfidf_grid_search.fit(X_train, y_train)
     bag_of_words_grid_search = GridSearchCV(estimator=bag_of_words_pipeline, param_grid=bag_of_words_param_grid, cv=5,
                                             scoring='accuracy', verbose=1, error_score="raise")
     bag_of_words_grid_search.fit(X_train, y_train)
-    tfidf_best_hyperparameters = tfidf_grid_search.best_params_
+    # tfidf_best_hyperparameters = tfidf_grid_search.best_params_
     bag_of_words_best_hyperparameters = bag_of_words_grid_search.best_params_
-    tfidf_best_SVM_model = tfidf_grid_search.best_estimator_
-    tfidf_pipeline.set_params(**tfidf_grid_search.best_params_)
-    tfidf_pipeline.fit(X_train, y_train)
+    # tfidf_best_SVM_model = tfidf_grid_search.best_estimator_
+    # tfidf_pipeline.set_params(**tfidf_grid_search.best_params_)
+    # tfidf_pipeline.fit(X_train, y_train)
     bag_of_words_best_SVM_model = bag_of_words_grid_search.best_estimator_
     bag_of_words_pipeline.set_params(**bag_of_words_grid_search.best_params_)
     bag_of_words_pipeline.fit(X_train, y_train)
-    y_pred_tfidf = cross_val_predict(tfidf_best_SVM_model, X_train, y_train, cv=5)
+    # y_pred_tfidf = cross_val_predict(tfidf_best_SVM_model, X_train, y_train, cv=5)
     y_pred_bag_of_words = cross_val_predict(bag_of_words_best_SVM_model, X_train, y_train, cv=5)
-    tfidf_y_pred_test = tfidf_pipeline.predict(X_test)
+    # tfidf_y_pred_test = tfidf_pipeline.predict(X_test)
     bag_of_words_y_pred_test = bag_of_words_pipeline.predict(X_test)
 
     """    
     print("TF-IDF Classification Report TEST:")
     print(metrics.classification_report(y_test, tfidf_y_pred_test))
     print()
-    
+
     print("Bag of Words Classification Report TEST:")
     print(metrics.classification_report(y_test, bag_of_words_y_pred_test))
     print()
     """
 
-    result["tfidf_unweighted_unenhanced" + str(n_gram_range)] = metrics.classification_report(y_test, tfidf_y_pred_test)
+    # result["tfidf_weighted_unenhanced" + str(n_gram_range)] = metrics.classification_report(y_test, tfidf_y_pred_test)
     result["BOW_unweighted_unenhanced" + str(n_gram_range)] = metrics.classification_report(y_test, bag_of_words_y_pred_test)
 
 print(result)

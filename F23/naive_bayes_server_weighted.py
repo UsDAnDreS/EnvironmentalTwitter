@@ -94,17 +94,18 @@ nb_count_pipeline = Pipeline([('vectorizer', count_vectorizer),
 
 param_count_grid = [
     {
-        'vectorizer__min_df': [0.0],
+        'vectorizer__min_df': [1,2,5],
         'classifier__alpha': [1.0e-10, 0.5, 2.0, 5.0, 10.0],
         'classifier__fit_prior': [True, False],
     }
 ]
 
-grid_search_count = GridSearchCV(nb_count_pipeline, param_count_grid, cv=5, scoring='accuracy', verbose=1)
+grid_search_count = GridSearchCV(nb_count_pipeline, param_count_grid, cv=5, scoring='accuracy', verbose=1, classifier__sample_weight=weights_list)
 grid_search_count.fit(X_train, y_train)
 
 nb_count_pipeline.set_params(**grid_search_count.best_params_)
-nb_count_pipeline.fit(X_train, y_train, classifier__sample_weight=weights_list)
+# nb_count_pipeline.fit(X_train, y_train, classifier__sample_weight=weights_list)
+nb_count_pipeline.fit(X_train, y_train)
 
 y_pred_count = cross_val_predict(nb_count_pipeline, X_train, y_train, cv=5)
 y_pred_count_test = nb_count_pipeline.predict(X_test)

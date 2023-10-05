@@ -72,7 +72,7 @@ nb_count_pipeline = Pipeline([('vectorizer', count_vectorizer),
 
 param_count_grid = [
     {
-        'vectorizer__min_df': [0.0],
+        'vectorizer__min_df': [1,2,5],
         'classifier__alpha': [1.0e-10, 0.5, 2.0, 5.0, 10.0],
         'classifier__fit_prior': [True, False],
     }
