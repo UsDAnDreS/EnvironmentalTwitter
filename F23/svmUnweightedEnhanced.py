@@ -51,6 +51,17 @@ def preprocessing(row):
 
 df['description_lemmatized'] = df['description'].apply(preprocessing)
 
+# Enhanced data
+filepath = "./data/finalized_BIASED_accounts_ONLY_NON_OTHER_emojis_replaced.csv"
+
+df2 = pd.read_csv(filepath)
+df2 = df2[((df2[hand_label] == 'media') | (df2[hand_label] == academia) | (df2[hand_label] == government) | (
+        df2[hand_label] == 'other'))]
+
+df2 = df2[['username', 'description', hand_label]]  # keep only relevant columns
+
+df2['description_lemmatized'] = df2['description'].apply(preprocessing)
+
 # split my data into training, and test sets
 scaler = StandardScaler()
 
@@ -59,6 +70,13 @@ y_labels = df[hand_label]
 
 X_train, X_test, y_train, y_test = train_test_split(X, y_labels, test_size=0.2, random_state=42, stratify=y_labels)
 
+X2 = df2['description_lemmatized']
+Y2 = df2[hand_label]
+
+X_train = pd.concat([X_train, X2])
+y_train = pd.concat([y_train, Y2])
+
+
 tfidf_transformer = TfidfTransformer()
 
 n_gram_ranges = [(1, 1)]
@@ -66,24 +84,6 @@ n_gram_ranges = [(1, 1)]
 result = {}
 for n_gram_range in n_gram_ranges:
     count_vectorizer = CountVectorizer(stop_words="english", ngram_range=n_gram_range)
-
-    """ 
-    tfidf_pipeline = Pipeline([
-        ('vectorizer', count_vectorizer),
-        ('transformer', tfidf_transformer),
-        ('normalize', StandardScaler(with_mean=False)),
-        ('classifier', SVC())
-    ])
-    
-    tfidf_param_grid = [
-        {
-            ''
-            'vectorizer__min_df': [1,2,5],
-            'transformer__use_idf': [True],
-            'classifier__C': [1.0e-10, 0.5, 3.0, 10.0],
-            'classifier__kernel': ['linear', 'poly', 'rbf', 'sigmoid'],
-            # 'classifier__class_weight': ["balanced"]
-        }] """
     bag_of_words_pipeline = Pipeline([
         ('vectorizer', count_vectorizer),
         ('normalize', StandardScaler(with_mean=False)),
@@ -95,42 +95,23 @@ for n_gram_range in n_gram_ranges:
             'vectorizer__min_df': [1, 2, 5],
             'classifier__C': [1.0e-10, 0.5, 3.0, 10.0],
             'classifier__kernel': ['linear', 'poly', 'rbf', 'sigmoid'],
-            # 'classifier__class_weight': ["balanced"]
         }
     ]
 
-    # tfidf_grid_search = GridSearchCV(estimator=tfidf_pipeline, param_grid=tfidf_param_grid, cv=5, scoring='accuracy',verbose=1, error_score="raise")
-    # tfidf_grid_search.fit(X_train, y_train)
     bag_of_words_grid_search = GridSearchCV(estimator=bag_of_words_pipeline, param_grid=bag_of_words_param_grid, cv=5,
                                             scoring='accuracy', verbose=1, error_score="raise")
     bag_of_words_grid_search.fit(X_train, y_train)
-    # tfidf_best_hyperparameters = tfidf_grid_search.best_params_
     bag_of_words_best_hyperparameters = bag_of_words_grid_search.best_params_
-    # tfidf_best_SVM_model = tfidf_grid_search.best_estimator_
-    # tfidf_pipeline.set_params(**tfidf_grid_search.best_params_)
-    # tfidf_pipeline.fit(X_train, y_train)
     bag_of_words_best_SVM_model = bag_of_words_grid_search.best_estimator_
     bag_of_words_pipeline.set_params(**bag_of_words_grid_search.best_params_)
     bag_of_words_pipeline.fit(X_train, y_train)
-    # y_pred_tfidf = cross_val_predict(tfidf_best_SVM_model, X_train, y_train, cv=5)
     y_pred_bag_of_words_cross_validation = cross_val_predict(bag_of_words_best_SVM_model, X_train, y_train, cv=5)
-    # tfidf_y_pred_test = tfidf_pipeline.predict(X_test)
     bag_of_words_y_pred_test = bag_of_words_pipeline.predict(X_test)
-
-    """    
-    print("TF-IDF Classification Report TEST:")
-    print(metrics.classification_report(y_test, tfidf_y_pred_test))
-    print()
-
-    print("Bag of Words Classification Report TEST:")
-    print(metrics.classification_report(y_test, bag_of_words_y_pred_test))
-    print()
-    """
 
     cm_count = confusion_matrix(y_train, y_pred_bag_of_words_cross_validation, normalize='true')
 
     result["SVM_BOW_unweighted_enhanced_cross_validation_confusion_matrix" + str(n_gram_range)] = cm_count
-    result["BOW_unweighted_unenhanced_predictions_testSet" + str(n_gram_range)] = metrics.classification_report(y_test,
+    result["SVM_BOW_unweighted_enhanced_predictions_testSet" + str(n_gram_range)] = metrics.classification_report(y_test,
                                                                                                                 bag_of_words_y_pred_test)
 
 print(result)
@@ -141,4 +122,5 @@ def save_dict_to_file(dictionary, filename):
         json.dump(dictionary, file)
 
 
-save_dict_to_file(result, 'SVM_unWeighted_unenhanced.txt')
+save_dict_to_file(result, 'SVM_unWeighted_enhanced.txt')
+
