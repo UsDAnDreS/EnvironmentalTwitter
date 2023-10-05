@@ -100,8 +100,8 @@ param_count_grid = [
     }
 ]
 
-grid_search_count = GridSearchCV(nb_count_pipeline, param_count_grid, cv=5, scoring='accuracy', verbose=1, classifier__sample_weight=weights_list)
-grid_search_count.fit(X_train, y_train)
+grid_search_count = GridSearchCV(nb_count_pipeline, param_count_grid, cv=5, scoring='accuracy', verbose=1)
+grid_search_count.fit(X_train, y_train, classifier__sample_weight=weights_list)
 
 nb_count_pipeline.set_params(**grid_search_count.best_params_)
 # nb_count_pipeline.fit(X_train, y_train, classifier__sample_weight=weights_list)
