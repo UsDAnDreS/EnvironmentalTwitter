@@ -134,7 +134,7 @@ for n_gram_range in n_gram_ranges:
     bag_of_words_pipeline.set_params(**bag_of_words_grid_search.best_params_)
     bag_of_words_pipeline.fit(X_train, y_train)
     # y_pred_tfidf = cross_val_predict(tfidf_best_SVM_model, X_train, y_train, cv=5)
-    y_pred_bag_of_words = cross_val_predict(bag_of_words_best_SVM_model, X_train, y_train, cv=5)
+    y_pred_bag_of_words_cross_validation = cross_val_predict(bag_of_words_best_SVM_model, X_train, y_train, cv=5)
     # tfidf_y_pred_test = tfidf_pipeline.predict(X_test)
     bag_of_words_y_pred_test = bag_of_words_pipeline.predict(X_test)
 
@@ -148,8 +148,8 @@ for n_gram_range in n_gram_ranges:
     print()
     """
 
-    # result["tfidf_weighted_unenhanced" + str(n_gram_range)] = metrics.classification_report(y_test, tfidf_y_pred_test)
-    result["BOW_weighted_unenhanced" + str(n_gram_range)] = metrics.classification_report(y_test, bag_of_words_y_pred_test)
+    result["BOW_weighted_unenhanced_cross_validation" + str(n_gram_range)] = metrics.classification_report(y_test, y_pred_bag_of_words_cross_validation)
+    result["BOW_weighted_unenhanced_predictions_testSet" + str(n_gram_range)] = metrics.classification_report(y_test, bag_of_words_y_pred_test)
 
 print(result)
 
