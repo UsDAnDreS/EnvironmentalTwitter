@@ -50,7 +50,7 @@ def preprocessing(row):
 
 
 df['description_lemmatized'] = df['description'].apply(preprocessing)
-"""
+
 # Enhanced data
 filepath = "./data/finalized_BIASED_accounts_ONLY_NON_OTHER_emojis_replaced.csv"
 
@@ -61,7 +61,7 @@ df2 = df2[((df2[hand_label] == 'media') | (df2[hand_label] == academia) | (df2[h
 df2 = df2[['username', 'description', hand_label]]  # keep only relevant columns
 
 df2['description_lemmatized'] = df2['description'].apply(preprocessing)
-"""
+
 # %%
 # split my data into training, and test sets
 scaler = StandardScaler()
@@ -71,11 +71,11 @@ y_labels = df[hand_label]
 
 X_train, X_test, y_train, y_test = train_test_split(X, y_labels, test_size=0.2, random_state=42, stratify=y_labels)
 # %%
-# X2 = df2['description_lemmatized']
-# Y2 = df2[hand_label]
+X2 = df2['description_lemmatized']
+Y2 = df2[hand_label]
 
-# X_train = pd.concat([X_train, X2])
-# y_train = pd.concat([y_train, Y2])
+X_train = pd.concat([X_train, X2])
+y_train = pd.concat([y_train, Y2])
 
 tfidf_transformer = TfidfTransformer()
 
