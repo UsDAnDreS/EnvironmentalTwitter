@@ -145,8 +145,8 @@ for n_gram_range in n_gram_ranges:
     print()
     """
 
-    result["BOW_unweighted_unenhanced_cross_validation" + str(n_gram_range)] = metrics.classification_report(y_test,
-                                                                                                           y_pred_bag_of_words_cross_validation)
+    # result["BOW_unweighted_unenhanced_cross_validation" + str(n_gram_range)] = metrics.classification_report(y_test,
+                                                                                                           # y_pred_bag_of_words_cross_validation)
     result["BOW_unweighted_unenhanced_predictions_testSet" + str(n_gram_range)] = metrics.classification_report(y_test,
                                                                                                               bag_of_words_y_pred_test)
 

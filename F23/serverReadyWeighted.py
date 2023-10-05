@@ -113,7 +113,7 @@ for n_gram_range in n_gram_ranges:
 
     bag_of_words_param_grid = [
         {
-            'vectorizer__min_df': [1,2,5],
+            'vectorizer__min_df': [1],
             'classifier__C': [1.0e-10, 0.5, 3.0, 10.0],
             'classifier__kernel': ['linear', 'poly', 'rbf', 'sigmoid'],
             'classifier__class_weight': ["balanced"]
@@ -147,9 +147,11 @@ for n_gram_range in n_gram_ranges:
     print(metrics.classification_report(y_test, bag_of_words_y_pred_test))
     print()
     """
+    print(y_pred_bag_of_words_cross_validation)
 
-    result["BOW_weighted_unenhanced_cross_validation" + str(n_gram_range)] = metrics.classification_report(y_test, y_pred_bag_of_words_cross_validation)
-    result["BOW_weighted_unenhanced_predictions_testSet" + str(n_gram_range)] = metrics.classification_report(y_test, bag_of_words_y_pred_test)
+    # result["BOW_weighted_unenhanced_cross_validation" + str(n_gram_range)] = metrics.classification_report(y_test,
+    # y_pred_bag_of_words_cross_validation)
+    # result["BOW_weighted_unenhanced_predictions_testSet" + str(n_gram_range)] = metrics.classification_report(y_test, bag_of_words_y_pred_test)
 
 print(result)
 
@@ -159,4 +161,4 @@ def save_dict_to_file(dictionary, filename):
         json.dump(dictionary, file)
 
 
-save_dict_to_file(result, 'weighted_unenhanced.txt')
+# save_dict_to_file(result, 'weighted_unenhanced.txt')

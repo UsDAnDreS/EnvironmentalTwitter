@@ -82,7 +82,9 @@ grid_search_count = GridSearchCV(nb_count_pipeline, param_count_grid, cv=5, scor
 grid_search_count.fit(X_train, y_train)
 nb_count_pipeline.set_params(**grid_search_count.best_params_)
 nb_count_pipeline.fit(X_train, y_train)
-y_pred_count = cross_val_predict(nb_count_pipeline, X_train, y_train, cv=5)
+y_pred_count_cross_validation = cross_val_predict(nb_count_pipeline, X_train, y_train, cv=5)
+print(y_pred_count_cross_validation)
+
 y_pred_count_test = nb_count_pipeline.predict(X_test)
 
 result["BOW_unweighted_unenhanced" + str(n_gram_range)] = metrics.classification_report(y_test, y_pred_count_test)
