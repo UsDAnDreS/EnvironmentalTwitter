@@ -26,10 +26,11 @@ filepath = "./data/finalized_8K_accounts_emojis_replaced.csv"
 hand_label = "hand.label"
 government = "gov"
 academia = "acad"
+tourBiz = "tourbiz"
 
 df = pd.read_csv(filepath)
 
-df = df[((df[hand_label] == 'media') | (df[hand_label] == academia) | (df[hand_label] == government) | (
+df = df[((df[hand_label] == 'media') | (df[hand_label] == tourBiz) |(df[hand_label] == academia) | (df[hand_label] == government) | (
         df[hand_label] == 'other'))]
 
 df = df[['username', 'description', hand_label]]  # keep only relevant columns
@@ -56,7 +57,7 @@ df['description_lemmatized'] = df['description'].apply(preprocessing)
 filepath = "./data/finalized_BIASED_accounts_ONLY_NON_OTHER_emojis_replaced.csv"
 
 df2 = pd.read_csv(filepath)
-df2 = df2[((df2[hand_label] == 'media') | (df2[hand_label] == academia) | (df2[hand_label] == government) | (
+df2 = df2[((df2[hand_label] == 'media') | (df[hand_label] == tourBiz) | (df2[hand_label] == academia) | (df2[hand_label] == government) | (
         df2[hand_label] == 'other'))]
 
 df2 = df2[['username', 'description', hand_label]]  # keep only relevant columns
@@ -103,6 +104,8 @@ for n_gram_range in n_gram_ranges:
                                             scoring='accuracy', verbose=1, error_score="raise")
     bag_of_words_grid_search.fit(X_train, y_train)
     bag_of_words_best_hyperparameters = bag_of_words_grid_search.best_params_
+    print("SVM UNWEIGHT ENHANCED BEST PARAMS:", bag_of_words_best_hyperparameters)
+
     bag_of_words_best_SVM_model = bag_of_words_grid_search.best_estimator_
     bag_of_words_pipeline.set_params(**bag_of_words_grid_search.best_params_)
     bag_of_words_pipeline.fit(X_train, y_train)

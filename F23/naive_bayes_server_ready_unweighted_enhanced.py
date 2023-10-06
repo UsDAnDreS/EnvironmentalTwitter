@@ -1,8 +1,6 @@
 # Import libraries
 import pandas as pd
-from sklearn.metrics import confusion_matrix
 import numpy as np
-
 from nltk.stem import WordNetLemmatizer
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
 from sklearn.naive_bayes import MultinomialNB
@@ -16,6 +14,8 @@ from nltk import word_tokenize, pos_tag
 from collections import defaultdict
 import re
 import json
+from sklearn.metrics import confusion_matrix
+
 
 # Initialization
 lemmatizer = WordNetLemmatizer()
@@ -62,6 +62,16 @@ def preprocessing(row):
 
 
 df['description_lemmatized'] = df['description'].apply(preprocessing)
+# Enhanced data
+filepath = "./data/finalized_BIASED_accounts_ONLY_NON_OTHER_emojis_replaced.csv"
+
+df2 = pd.read_csv(filepath)
+df2 = df2[((df2[hand_label] == 'media') | (df[hand_label] == tourBiz) | (df2[hand_label] == academia) | (df2[hand_label] == government) | (
+        df2[hand_label] == 'other'))]
+
+df2 = df2[['username', 'description', hand_label]]  # keep only relevant columns
+
+df2['description_lemmatized'] = df2['description'].apply(preprocessing)
 
 # split my data into training, and test sets
 scaler = StandardScaler()
@@ -70,6 +80,13 @@ X = df['description_lemmatized']
 y_labels = df[hand_label]
 
 X_train, X_test, y_train, y_test = train_test_split(X, y_labels, test_size=0.2, random_state=42, stratify=y_labels)
+
+X2 = df2['description_lemmatized']
+Y2 = df2[hand_label]
+
+X_train = pd.concat([X_train, X2])
+y_train = pd.concat([y_train, Y2])
+
 
 nb_count_pipeline = Pipeline([('vectorizer', count_vectorizer),
                               ('classifier', nb_clf)])
@@ -84,7 +101,7 @@ param_count_grid = [
 
 grid_search_count = GridSearchCV(nb_count_pipeline, param_count_grid, cv=5, scoring='accuracy', verbose=1)
 grid_search_count.fit(X_train, y_train)
-print("NAIVE BAYES UNWEIGHTED UNENHANCED BEST PARAMS:", grid_search_count.best_params_)
+print("NAIVE BAYES UNWEIGHTED ENHANCED BEST PARAMS:", grid_search_count.best_params_)
 nb_count_pipeline.set_params(**grid_search_count.best_params_)
 nb_count_pipeline.fit(X_train, y_train)
 y_pred_count_cross_validation = cross_val_predict(nb_count_pipeline, X_train, y_train, cv=5)
@@ -92,11 +109,10 @@ print(y_pred_count_cross_validation)
 
 y_pred_count_test = nb_count_pipeline.predict(X_test)
 
-
 cm_count = confusion_matrix(y_train, y_pred_count_cross_validation, normalize='true')
 np.savetxt("NB_BOW_unweighted_enhanced_cross_validation_confusion_matrix" + str(n_gram_range) + '.txt', cm_count,
                delimiter=',', fmt='%f')
-result["NB_BOW_unweighted_unenhanced" + str(n_gram_range)] = metrics.classification_report(y_test, y_pred_count_test)
+result["NB_BOW_unweighted_enhanced" + str(n_gram_range)] = metrics.classification_report(y_test, y_pred_count_test)
 
 
 def save_dict_to_file(dictionary, filename):
@@ -104,4 +120,4 @@ def save_dict_to_file(dictionary, filename):
         json.dump(dictionary, file)
 
 
-save_dict_to_file(result, 'NB_unweighted_unenhanced.txt')
+save_dict_to_file(result, 'NB_unweighted_enhanced.txt')

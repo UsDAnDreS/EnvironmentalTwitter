@@ -26,10 +26,11 @@ filepath = "./data/finalized_8K_accounts_emojis_replaced.csv"
 hand_label = "hand.label"
 government = "gov"
 academia = "acad"
+tourBiz = "tourbiz"
 
 df = pd.read_csv(filepath)
 
-df = df[((df[hand_label] == 'media') | (df[hand_label] == academia) | (df[hand_label] == government) | (
+df = df[((df[hand_label] == 'media') | (df[hand_label] == tourBiz) |(df[hand_label] == academia) | (df[hand_label] == government) | (
         df[hand_label] == 'other'))]
 
 df = df[['username', 'description', hand_label]]  # keep only relevant columns
@@ -107,6 +108,7 @@ for n_gram_range in n_gram_ranges:
     bag_of_words_grid_search.fit(X_train, y_train)
     # tfidf_best_hyperparameters = tfidf_grid_search.best_params_
     bag_of_words_best_hyperparameters = bag_of_words_grid_search.best_params_
+    print("SVM UNWEIGHT UNENHANCED BEST PARAMS", bag_of_words_best_hyperparameters)
     # tfidf_best_SVM_model = tfidf_grid_search.best_estimator_
     # tfidf_pipeline.set_params(**tfidf_grid_search.best_params_)
     # tfidf_pipeline.fit(X_train, y_train)

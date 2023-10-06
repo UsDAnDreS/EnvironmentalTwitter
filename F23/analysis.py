@@ -1,6 +1,8 @@
 import re
-
 import ast
+from sklearn.metrics import ConfusionMatrixDisplay
+import matplotlib.pyplot as plt
+import numpy as np
 
 
 def open_model_output(path):
@@ -27,6 +29,7 @@ def clean_up_results(key, results):
     print()
 
 
+"""
 # Everything SVM
 SVM_unweighted = "unWeighted_unenhanced.txt"
 unweighted = open_model_output(SVM_unweighted)
@@ -59,3 +62,40 @@ print("Naive Bayes Model:")
 
 clean_up_results("BOW_unweighted_unenhanced(1, 1)", nb_unweighted)
 clean_up_results("BOW_weighted_unenhanced(1, 1)", nb_weighted)
+"""
+
+list_of_files = [
+    "NB_weighted_unenhanced.txt", "NB_unweighted_unenhanced.txt", "SVM_unWeighted_enhanced.txt",
+    "SVM_weighted_unenhanced.txt",
+    "SVM_unWeighted_unenhanced.txt"
+]
+
+for file in list_of_files:
+    current_file = open_model_output(file)
+    for key, _ in current_file.items():
+        clean_up_results(key, current_file)
+
+confusion_matrices = [
+    "SVM_BOW_unweighted_enhanced_cross_validation_confusion_matrix(1, 1).txt",
+    "SVM_BOW_unweighted_unenhanced_cross_validation_confusion_matrix(1, 1).txt",
+    "SVM_BOW_Weighted_unenhanced_cross_validation_confusion_matrix(1, 1).txt"
+]
+
+
+def open_cm_model_output(path):
+    with open(path, "r") as file:
+        file_content = file.read()
+        return file_content
+
+
+for file in confusion_matrices:
+    # Convert the string to a 2D array
+    array_str = open_cm_model_output(file)
+    rows = array_str.strip().split('\n')
+    array = np.array([list(map(float, row.split(','))) for row in rows])
+
+    print(file)
+    disp_count = ConfusionMatrixDisplay(confusion_matrix=array,
+                                        display_labels=['academia', 'government', 'media', 'other'])
+    disp_count.plot()
+    plt.show()
