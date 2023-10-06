@@ -14,6 +14,7 @@ from collections import defaultdict
 import re
 import json
 from sklearn.metrics import confusion_matrix
+import pickle
 
 tag_map = defaultdict(lambda: wn.NOUN)
 tag_map['J'] = wn.ADJ
@@ -118,6 +119,20 @@ for n_gram_range in n_gram_ranges:
 
     result["SVM_BOW_unweighted_enhanced_predictions_testSet" + str(n_gram_range)] = metrics.classification_report(y_test,
                                                                                                                 bag_of_words_y_pred_test)
+
+    filename = "SVM_BOW_unweighted_enhanced_model.pickle"
+    # save model
+    pickle.dump(bag_of_words_pipeline, open(filename, "wb"))
+
+    full_x = pd.concat([X_train, X_test])
+    full_y = pd.concat([y_train, y_test])
+
+    bag_of_words_grid_search.fit(full_x, full_y)
+    bag_of_words_pipeline.set_params(**bag_of_words_grid_search.best_params_)
+    bag_of_words_pipeline.fit(full_x, full_y)
+
+    filename = "SVM_BOW_unweighted_enhanced_model_full.pickle"
+    pickle.dump(bag_of_words_pipeline, open(filename, "wb"))
 
 print(result)
 
