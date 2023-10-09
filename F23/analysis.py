@@ -23,9 +23,11 @@ def clean_up_results(key, results):
     print(test_case[9].rjust(column_width), test_case[12].rjust(column_width))
     print(test_case[14].rjust(column_width), test_case[17].rjust(column_width))
     print(test_case[19].rjust(column_width), test_case[22].rjust(column_width))
-    print(test_case[24].rjust(column_width), test_case[25].rjust(column_width))
-    print((test_case[27] + " " + test_case[28]).rjust(column_width), test_case[31].rjust(column_width))
-    print((test_case[33] + " " + test_case[34]).rjust(column_width), test_case[37].rjust(column_width))
+    print(test_case[24].rjust(column_width), test_case[27].rjust(column_width))
+    print(test_case[29].rjust(column_width), test_case[30].rjust(column_width))
+
+    print((test_case[32] + " " + test_case[33]).rjust(column_width), test_case[36].rjust(column_width))
+    print((test_case[38] + " " + test_case[39]).rjust(column_width), test_case[42].rjust(column_width))
     print()
 
 
@@ -65,9 +67,8 @@ clean_up_results("BOW_weighted_unenhanced(1, 1)", nb_weighted)
 """
 
 list_of_files = [
-    "NB_weighted_unenhanced.txt", "NB_unweighted_unenhanced.txt", "SVM_unWeighted_enhanced.txt",
-    "SVM_weighted_unenhanced.txt",
-    "SVM_unWeighted_unenhanced.txt"
+    "SVM_unWeighted_enhanced.txt", "SVM_unWeighted_unenhanced.txt", "NB_unweighted_unenhanced.txt",
+    "NB_unweighted_enhanced.txt"
 ]
 
 for file in list_of_files:
@@ -76,9 +77,9 @@ for file in list_of_files:
         clean_up_results(key, current_file)
 
 confusion_matrices = [
+    "NB_BOW_unweighted_enhanced_cross_validation_confusion_matrix(1, 1).txt",
     "SVM_BOW_unweighted_enhanced_cross_validation_confusion_matrix(1, 1).txt",
-    "SVM_BOW_unweighted_unenhanced_cross_validation_confusion_matrix(1, 1).txt",
-    "SVM_BOW_Weighted_unenhanced_cross_validation_confusion_matrix(1, 1).txt"
+    "SVM_BOW_unweighted_unenhanced_cross_validation_confusion_matrix(1, 1).txt"
 ]
 
 
@@ -96,6 +97,10 @@ for file in confusion_matrices:
 
     print(file)
     disp_count = ConfusionMatrixDisplay(confusion_matrix=array,
-                                        display_labels=['academia', 'government', 'media', 'other'])
+                                        display_labels=['academia', 'government', 'media', 'other', 'tourbiz'])
     disp_count.plot()
+
+    characters = file.split("_cross_validation")[0].split("_")
+    title = ' '.join(characters)
+    disp_count.ax_.set_title(title)
     plt.show()
