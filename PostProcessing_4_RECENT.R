@@ -6,7 +6,7 @@
 ##    - Second layer corresponds to the 6 LOCATIONS, hence 6 elements (titled "Tampa", "Pinellas.Clearwater", etc)
 ##
 ##
-## Creating .csv data set files
+## Creating .csv data set files:
 ##    Simply disposing of the "list"/"data.frame" style variables (retaining only SIMPLE columns),
 ##    (while still keeping those around in the aforementioned R object)
 ##
