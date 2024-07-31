@@ -143,7 +143,8 @@ fix_page_data<-function(page.data){
   df.col.ind <- NULL
   
   for(j in 1:ncol(page.data)){
-    if((class(page.data[,j])=="data.frame")){
+   # print(j)
+    if((class(page.data[,j])[1]=="data.frame")){
       df.col.ind <- c(df.col.ind, j)
       
       #print(colnames(page.data)[j])
